@@ -16,16 +16,19 @@ public class RegressionSgdTrainer {
         LossFunction lossFunction = config.lossFunctionType.getLossFunction();
         Assert.check(lossFunction != null);
 
-        double learningRate = config.learningRate;
         for (int i = 0; i < config.numIter; ++i) {
+            System.out.println("training epoch #" + i);
             for (T observation : dataset) {
                 double prediction = regressionModelWeights.apply(observation);
                 double label = observation.getLabel();
-                regressionModelWeights.bias -= learningRate * lossFunction.derivative(prediction, label);
+                regressionModelWeights.bias -= config.learningRate * lossFunction.derivative(prediction, label);
 
                 for (Map.Entry<Integer, Double> entry : observation.getFeatures().entrySet()) {
-                    double gradient = lossFunction.derivative(prediction, label) * entry.getValue();
-                    regressionModelWeights.featureWeights.merge(entry.getKey(), -gradient, (a, b) -> a + b);
+                    double gradient = lossFunction.derivative(prediction, label) * entry.getValue() +
+                            config.featureWeightsRegularizer *
+                                    regressionModelWeights.featureWeights.getOrDefault(entry.getKey(), 0.0);
+                    regressionModelWeights.featureWeights.merge(entry.getKey(), -config.learningRate * gradient,
+                            (a, b) -> a + b);
                 }
             }
         }
