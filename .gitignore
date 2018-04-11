@@ -1,0 +1,35 @@
+# Gradle
+.gradle/
+/build/
+/*/build/
+/devel/*/build
+/integration-tests/*/build
+/alet/*/build
+
+# Generated sources and resources
+/**/src/generated/
+
+# IDEA
+/.idea/
+*.iml
+*.iws
+*.ipr
+/out/
+/*/out/
+atlassian-ide-plugin.xml
+
+# Java and Python compiler outputs
+*.class
+*.pyc
+
+# OS X Finder settings
+.DS_Store
+
+# Remnants of Ant and Ivy
+/*/lib/
+/target/
+/*/target/
+
+# Vim
+*.swp
+*.swo
