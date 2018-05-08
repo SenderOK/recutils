@@ -9,7 +9,7 @@ public class BinaryLogisticLoss implements LossFunction {
         if (exp < 0) {
             return Math.log1p(Math.exp(exp));
         } else {
-            return (exp + Math.log1p(Math.exp(-exp)));
+            return exp + Math.log1p(Math.exp(-exp));
         }
     }
 

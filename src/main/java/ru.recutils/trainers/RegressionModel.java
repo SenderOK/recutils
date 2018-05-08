@@ -8,6 +8,7 @@ import ru.recutils.exceptions.ModelNotTrainedException;
 import ru.recutils.common.ModelType;
 import ru.recutils.common.ObservationHolder;
 import ru.recutils.io.FeatureNameHasher;
+import ru.recutils.lossfuncs.LossFunction;
 
 public class RegressionModel<T extends ObservationHolder> implements HashedLinearModel<T> {
     private final FeatureNameHasher featureNameHasher;
@@ -44,9 +45,16 @@ public class RegressionModel<T extends ObservationHolder> implements HashedLinea
             throw new ModelNotTrainedException();
         }
         List<Double> result = new ArrayList<>();
+        double lossSum = 0;
+        int objectCount = 0;
+        LossFunction lossFunction = sgdTrainerConfig.lossFunctionType.getLossFunction();
         for (ObservationHolder observation : dataset) {
-            result.add(regressionModelWeights.apply(observation));
+            double prediction = regressionModelWeights.apply(observation);
+            lossSum += lossFunction.value(prediction, observation.getLabel());
+            ++objectCount;
+            result.add(prediction);
         }
+        System.out.println("Average loss on " + objectCount + " objects is " + lossSum / objectCount);
         return result;
     }
 }

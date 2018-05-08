@@ -8,12 +8,12 @@ public class VwFeatureNameHasher implements FeatureNameHasher {
 
     private final int bitMask;
 
-    public VwFeatureNameHasher(int bitMask) {
+    private VwFeatureNameHasher(int bitMask) {
         this.bitMask = bitMask;
     }
 
     public static VwFeatureNameHasher getHasher(int featuresHashBitSize) throws IndexOutOfBoundsException {
-        Assert.check(featuresHashBitSize <= 0 || featuresHashBitSize >= 31, "hash bit size too big");
+        Assert.check(featuresHashBitSize > 0 && featuresHashBitSize < 31, "hash bit size too big");
         int bitMask = (1 << featuresHashBitSize) - 1;
         return new VwFeatureNameHasher(bitMask);
     }
