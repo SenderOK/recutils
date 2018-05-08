@@ -1,7 +1,8 @@
 package ru.recutils.io;
 
 import com.sangupta.murmur.Murmur3;
-import com.sun.tools.javac.util.Assert;
+
+import ru.recutils.exceptions.InvalidHashBitSizeException;
 
 public class VwFeatureNameHasher implements FeatureNameHasher {
     private static final long SEED = 1543154315431543L;
@@ -12,8 +13,10 @@ public class VwFeatureNameHasher implements FeatureNameHasher {
         this.bitMask = bitMask;
     }
 
-    public static VwFeatureNameHasher getHasher(int featuresHashBitSize) throws IndexOutOfBoundsException {
-        Assert.check(featuresHashBitSize > 0 && featuresHashBitSize < 31, "hash bit size too big");
+    public static VwFeatureNameHasher getHasher(int featuresHashBitSize) throws InvalidHashBitSizeException {
+        if (!(featuresHashBitSize > 0 && featuresHashBitSize < 31)) {
+            throw new InvalidHashBitSizeException();
+        }
         int bitMask = (1 << featuresHashBitSize) - 1;
         return new VwFeatureNameHasher(bitMask);
     }

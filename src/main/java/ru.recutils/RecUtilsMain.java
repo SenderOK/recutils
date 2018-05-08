@@ -14,6 +14,7 @@ import ru.recutils.common.HashedLinearModelLoader;
 import ru.recutils.common.LossFunctionType;
 import ru.recutils.common.ModelType;
 import ru.recutils.common.OptimizationAlgorithmType;
+import ru.recutils.exceptions.InvalidHashBitSizeException;
 import ru.recutils.exceptions.ModelNotTrainedException;
 import ru.recutils.trainers.FmModel;
 import ru.recutils.io.FeatureNameHasher;
@@ -26,7 +27,7 @@ import ru.recutils.trainers.AlsTrainerConfig;
 import ru.recutils.trainers.SgdTrainerConfig;
 
 public class RecUtilsMain {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InvalidHashBitSizeException {
         CommandLineArguments commandLineArguments = new CommandLineArguments();
         JCommander jCommander = new JCommander(commandLineArguments);
         jCommander.setCaseSensitiveOptions(false);
@@ -51,7 +52,7 @@ public class RecUtilsMain {
         }
     }
 
-    private static void doTrain(CommandLineArguments args) {
+    private static void doTrain(CommandLineArguments args) throws InvalidHashBitSizeException {
         if (args.modelType == ModelType.REGRESSION && args.optimizationAlgorithmType != OptimizationAlgorithmType.SGD) {
             System.out.println("for regression task only sgd is available, will use sgd");
         }

@@ -5,6 +5,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Iterator;
 
+import ru.recutils.exceptions.DatasetLineParsingException;
+
 public class DatasetIterator<FeaturesHolderT> implements Iterator<FeaturesHolderT> {
     private final StringToFeaturesHolderConverter<FeaturesHolderT> converter;
     private final BufferedReaderIterator bufferedReaderIterator;
@@ -27,8 +29,12 @@ public class DatasetIterator<FeaturesHolderT> implements Iterator<FeaturesHolder
         String s = this.bufferedReaderIterator.next();
         if (s == null) {
             return null;
-        } else {
+        }
+        try {
             return converter.convert(s);
+        } catch (DatasetLineParsingException e) {
+            System.err.println(e.getMessage());
+            return null;
         }
     }
 

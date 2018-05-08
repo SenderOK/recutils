@@ -2,8 +2,6 @@ package ru.recutils.trainers;
 
 import java.util.Map;
 
-import com.sun.tools.javac.util.Assert;
-
 import ru.recutils.common.ObservationHolder;
 import ru.recutils.lossfuncs.LossFunction;
 
@@ -14,8 +12,6 @@ public class RegressionSgdTrainer {
             SgdTrainerConfig config)
     {
         LossFunction lossFunction = config.lossFunctionType.getLossFunction();
-        Assert.check(lossFunction != null);
-
         for (int i = 0; i < config.numIter; ++i) {
             System.out.println("training epoch #" + i);
 
