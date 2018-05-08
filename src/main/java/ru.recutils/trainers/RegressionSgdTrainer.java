@@ -20,6 +20,7 @@ public class RegressionSgdTrainer {
             for (T observation : dataset) {
                 double prediction = regressionModelWeights.apply(observation);
                 double label = observation.getLabel();
+                double importance = observation.getImportance();
                 lossSum += lossFunction.value(prediction, label);
                 ++objectCount;
 
@@ -31,8 +32,11 @@ public class RegressionSgdTrainer {
                     double gradient = lossFunction.derivative(prediction, label) * featureValue +
                             config.featureWeightsRegularizer *
                                     regressionModelWeights.featureWeights.getOrDefault(featureHash, 0.0);
-                    regressionModelWeights.featureWeights.merge(featureHash, -config.learningRate * gradient,
-                            (a, b) -> a + b);
+                    regressionModelWeights.featureWeights.merge(
+                            featureHash,
+                            -config.learningRate * importance * gradient,
+                            (a, b) -> a + b
+                    );
                 }
             }
 
