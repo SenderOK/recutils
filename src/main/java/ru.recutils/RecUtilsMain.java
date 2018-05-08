@@ -33,6 +33,11 @@ public class RecUtilsMain {
         jCommander.setCaseSensitiveOptions(false);
         jCommander.parse(args);
 
+        if (commandLineArguments.help) {
+            jCommander.usage();
+            return;
+        }
+
         if (commandLineArguments.trainPath == null && commandLineArguments.testPath == null) {
             System.err.println("Neither training set nor test set specified, exiting");
             return;
