@@ -1,14 +1,19 @@
 package ru.recutils.trainers.fm;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import ru.recutils.common.HashedLinearModel;
+import ru.recutils.common.LossFunctionType;
+import ru.recutils.common.OptimizationAlgorithmType;
 import ru.recutils.exceptions.ModelNotTrainedException;
 import ru.recutils.common.ModelType;
 import ru.recutils.common.ObservationHolder;
 import ru.recutils.io.FeatureNameHasher;
+import ru.recutils.lossfuncs.LossFunction;
 import ru.recutils.trainers.BaseLinearTrainerConfig;
+import ru.recutils.trainers.SgdTrainerConfig;
 
 public class FmModel<T extends ObservationHolder> implements HashedLinearModel<T>, Serializable {
     private final FeatureNameHasher featureNameHasher;
@@ -31,8 +36,12 @@ public class FmModel<T extends ObservationHolder> implements HashedLinearModel<T
 
     @Override
     public void fit(Iterable<T> dataset) {
-
-        wasTrained = true;
+        if (trainerConfig.getOptimizationType() == OptimizationAlgorithmType.SGD) {
+            FmSgdTrainer.train(dataset, modelWeights, fmModelConfig, (SgdTrainerConfig) trainerConfig);
+        } else {
+            FmAlsTrainer.train(dataset, modelWeights, fmModelConfig, trainerConfig);
+        }
+        this.wasTrained = true;
     }
 
     @Override
@@ -40,7 +49,21 @@ public class FmModel<T extends ObservationHolder> implements HashedLinearModel<T
         if (!wasTrained) {
             throw new ModelNotTrainedException();
         }
-        return null;
+        LossFunction lossFunction = (trainerConfig.getOptimizationType() == OptimizationAlgorithmType.SGD)
+                ? ((SgdTrainerConfig) trainerConfig).lossFunctionType.getLossFunction()
+                : LossFunctionType.MSE.getLossFunction();
+
+        List<Double> result = new ArrayList<>();
+        double lossSum = 0;
+        int objectCount = 0;
+        for (ObservationHolder observation : dataset) {
+            double prediction = modelWeights.apply(observation);
+            lossSum += lossFunction.value(prediction, observation.getLabel());
+            ++objectCount;
+            result.add(prediction);
+        }
+        System.out.println("Average loss on " + objectCount + " objects is " + lossSum / objectCount);
+        return result;
     }
 
     @Override

@@ -15,7 +15,7 @@ public class RegressionModel<T extends ObservationHolder> implements HashedLinea
     private final FeatureNameHasher featureNameHasher;
     private final RegressionModelConfig regressionModelConfig;
     private final SgdTrainerConfig sgdTrainerConfig;
-    private final RegressionModelWeights regressionModelWeights;
+    private final RegressionModelWeights modelWeights;
     private boolean wasTrained;
 
     public RegressionModel(
@@ -26,13 +26,13 @@ public class RegressionModel<T extends ObservationHolder> implements HashedLinea
         this.featureNameHasher = featureNameHasher;
         this.regressionModelConfig = regressionModelConfig;
         this.sgdTrainerConfig = sgdTrainerConfig;
-        this.regressionModelWeights = new RegressionModelWeights();
+        this.modelWeights = new RegressionModelWeights();
         this.wasTrained = false;
     }
 
     @Override
     public void fit(Iterable<T> dataset) {
-        RegressionSgdTrainer.train(dataset, regressionModelWeights, regressionModelConfig, sgdTrainerConfig);
+        RegressionSgdTrainer.train(dataset, modelWeights, regressionModelConfig, sgdTrainerConfig);
         this.wasTrained = true;
     }
 
@@ -56,7 +56,7 @@ public class RegressionModel<T extends ObservationHolder> implements HashedLinea
         int objectCount = 0;
         LossFunction lossFunction = sgdTrainerConfig.lossFunctionType.getLossFunction();
         for (ObservationHolder observation : dataset) {
-            double prediction = regressionModelWeights.apply(observation);
+            double prediction = modelWeights.apply(observation);
             lossSum += lossFunction.value(prediction, observation.getLabel());
             ++objectCount;
             result.add(prediction);

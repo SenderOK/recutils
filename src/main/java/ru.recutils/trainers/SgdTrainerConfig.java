@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import ru.recutils.cli.CommandLineArguments;
 import ru.recutils.common.LossFunctionType;
+import ru.recutils.common.OptimizationAlgorithmType;
 
 public class SgdTrainerConfig extends BaseLinearTrainerConfig implements Serializable {
     public final LossFunctionType lossFunctionType;
@@ -25,5 +26,10 @@ public class SgdTrainerConfig extends BaseLinearTrainerConfig implements Seriali
     public static SgdTrainerConfig fromCommandLineArguments(CommandLineArguments args) {
         return new SgdTrainerConfig(BaseLinearTrainerConfig.fromCommandLineArguments(args), args.lossFunctionType,
                 args.learningRate, args.numThreads);
+    }
+
+    @Override
+    public OptimizationAlgorithmType getOptimizationType() {
+        return OptimizationAlgorithmType.SGD;
     }
 }
