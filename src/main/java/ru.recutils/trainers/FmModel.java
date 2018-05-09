@@ -12,14 +12,20 @@ import ru.recutils.io.FeatureNameHasher;
 
 public class FmModel<T extends ObservationHolder> implements HashedLinearModel<T>, Serializable {
     private final FeatureNameHasher featureNameHasher;
-    private final BaseLinearTrainerConfig config;
+    private final FmModelConfig fmModelConfig;
+    private final BaseLinearTrainerConfig trainerConfig;
     private final FmModelWeights modelWeights;
     private boolean wasTrained;
 
-    public FmModel(FeatureNameHasher featureNameHasher, BaseLinearTrainerConfig config) {
+    public FmModel(
+            FeatureNameHasher featureNameHasher,
+            FmModelConfig fmModelConfig,
+            BaseLinearTrainerConfig trainerConfig)
+    {
         this.featureNameHasher = featureNameHasher;
-        this.config = config;
-        this.modelWeights = new FmModelWeights();
+        this.fmModelConfig = fmModelConfig;
+        this.trainerConfig = trainerConfig;
+        this.modelWeights = new FmModelWeights(fmModelConfig.dimension);
         this.wasTrained = false;
     }
 

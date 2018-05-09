@@ -22,8 +22,9 @@ import ru.recutils.io.IterableDataset;
 import ru.recutils.io.SimpleObservationHolder;
 import ru.recutils.io.VwFeatureNameHasher;
 import ru.recutils.io.VwLineParser;
+import ru.recutils.trainers.FmModelConfig;
 import ru.recutils.trainers.RegressionModel;
-import ru.recutils.trainers.AlsTrainerConfig;
+import ru.recutils.trainers.RegressionModelConfig;
 import ru.recutils.trainers.SgdTrainerConfig;
 
 public class RecUtilsMain {
@@ -71,16 +72,20 @@ public class RecUtilsMain {
         FeatureNameHasher featureNameHasher = VwFeatureNameHasher.getHasher(args.hashingBits);
         HashedLinearModel<SimpleObservationHolder> hashedLinearModel;
         if (args.modelType == ModelType.REGRESSION) {
+            RegressionModelConfig regressionModelConfig = RegressionModelConfig.fromCommandLineArguments(args);
             SgdTrainerConfig sgdTrainerConfig = SgdTrainerConfig.fromCommandLineArguments(args);
-            hashedLinearModel = new RegressionModel<SimpleObservationHolder>(featureNameHasher, sgdTrainerConfig);
+            hashedLinearModel = new RegressionModel<SimpleObservationHolder>(
+                    featureNameHasher, regressionModelConfig, sgdTrainerConfig);
         } else if (args.modelType == ModelType.FM) {
+            FmModelConfig fmModelConfig = FmModelConfig.fromCommandLineArguments(args);
             BaseLinearTrainerConfig linearTrainerConfig;
             if (args.optimizationAlgorithmType == OptimizationAlgorithmType.SGD) {
                 linearTrainerConfig = SgdTrainerConfig.fromCommandLineArguments(args);
             } else { // ALS
-                linearTrainerConfig = AlsTrainerConfig.fromCommandLineArguments(args);
+                linearTrainerConfig = BaseLinearTrainerConfig.fromCommandLineArguments(args);
             }
-            hashedLinearModel = new FmModel<SimpleObservationHolder>(featureNameHasher, linearTrainerConfig);
+            hashedLinearModel = new FmModel<SimpleObservationHolder>(
+                    featureNameHasher, fmModelConfig, linearTrainerConfig);
         } else {
             System.err.println("FFM is not implemented yet");
             return;

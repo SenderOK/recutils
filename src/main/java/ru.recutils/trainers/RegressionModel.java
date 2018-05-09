@@ -12,12 +12,18 @@ import ru.recutils.lossfuncs.LossFunction;
 
 public class RegressionModel<T extends ObservationHolder> implements HashedLinearModel<T> {
     private final FeatureNameHasher featureNameHasher;
+    private final RegressionModelConfig regressionModelConfig;
     private final SgdTrainerConfig sgdTrainerConfig;
     private final RegressionModelWeights regressionModelWeights;
     private boolean wasTrained;
 
-    public RegressionModel(FeatureNameHasher featureNameHasher, SgdTrainerConfig sgdTrainerConfig) {
+    public RegressionModel(
+            FeatureNameHasher featureNameHasher,
+            RegressionModelConfig regressionModelConfig,
+            SgdTrainerConfig sgdTrainerConfig)
+    {
         this.featureNameHasher = featureNameHasher;
+        this.regressionModelConfig = regressionModelConfig;
         this.sgdTrainerConfig = sgdTrainerConfig;
         this.regressionModelWeights = new RegressionModelWeights();
         this.wasTrained = false;
@@ -25,7 +31,7 @@ public class RegressionModel<T extends ObservationHolder> implements HashedLinea
 
     @Override
     public void fit(Iterable<T> dataset) {
-        RegressionSgdTrainer.train(dataset, regressionModelWeights, sgdTrainerConfig);
+        RegressionSgdTrainer.train(dataset, regressionModelWeights, regressionModelConfig, sgdTrainerConfig);
         this.wasTrained = true;
     }
 

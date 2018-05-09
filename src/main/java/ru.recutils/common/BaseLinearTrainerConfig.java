@@ -5,25 +5,21 @@ import java.io.Serializable;
 import ru.recutils.cli.CommandLineArguments;
 
 public class BaseLinearTrainerConfig implements Serializable {
-    public final double featureWeightsRegularizer;
+    public final long seed;
+    public final double initStddev;
     public final int numIter;
-    public final int numThreads;
 
-    public BaseLinearTrainerConfig(
-            double featureWeightsRegularizer,
-            int numIter,
-            int numThreads)
-    {
-        this.featureWeightsRegularizer = featureWeightsRegularizer;
+    public BaseLinearTrainerConfig(long seed, double initStddev, int numIter) {
+        this.seed = seed;
+        this.initStddev = initStddev;
         this.numIter = numIter;
-        this.numThreads = numThreads;
     }
 
     public BaseLinearTrainerConfig(BaseLinearTrainerConfig config) {
-        this(config.featureWeightsRegularizer, config.numIter, config.numThreads);
+        this(config.seed, config.initStddev, config.numIter);
     }
 
     public static BaseLinearTrainerConfig fromCommandLineArguments(CommandLineArguments args) {
-        return new BaseLinearTrainerConfig(args.featureWeightsRegularizer, args.numIter, args.numThreads);
+        return new BaseLinearTrainerConfig(args.seed, args.initStddev, args.numIter);
     }
 }

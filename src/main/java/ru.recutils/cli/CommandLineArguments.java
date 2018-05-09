@@ -51,10 +51,6 @@ public class CommandLineArguments {
             description = "dataset passes for SGD, number of iterations for ALS training")
     public int numIter = 100;
 
-    @Parameter(names = {"-b", "--batch-size"}, validateWith = PositiveInteger.class,
-            description = "number of training objects in batch (for SGD training)")
-    public int batchSize = 1;
-
     @Parameter(names={"-hb", "--hashing-bits"}, validateWith = PositiveInteger.class,
             description = "number of bits used for features hashing")
     public int hashingBits = 18;
@@ -68,6 +64,9 @@ public class CommandLineArguments {
     public int numThreads = 1;
 
     @Parameter(names={"-init", "--init-stddev"}, validateWith = PositiveDouble.class,
-            description = "standard deviation for initial random embeddings")
+            description = "standard deviation for initial weights")
     public double initStddev = 0.1;
+
+    @Parameter(names={"-s", "--seed"}, description = "random seed for training")
+    public long seed = 42;
 }

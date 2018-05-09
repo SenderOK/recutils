@@ -9,22 +9,22 @@ import ru.recutils.common.LossFunctionType;
 public class SgdTrainerConfig extends BaseLinearTrainerConfig implements Serializable {
     public final LossFunctionType lossFunctionType;
     public final double learningRate;
-    public final int batchSize;
+    public final int numThreads;
 
     public SgdTrainerConfig(
-            BaseLinearTrainerConfig baseLinearTrainerConfig,
+            BaseLinearTrainerConfig config,
             LossFunctionType lossFunctionType,
             double learningRate,
-            int batchSize)
+            int numThreads)
     {
-        super(baseLinearTrainerConfig);
+        super(config);
         this.lossFunctionType = lossFunctionType;
         this.learningRate = learningRate;
-        this.batchSize = batchSize;
+        this.numThreads = numThreads;
     }
 
     public static SgdTrainerConfig fromCommandLineArguments(CommandLineArguments args) {
         return new SgdTrainerConfig(BaseLinearTrainerConfig.fromCommandLineArguments(args), args.lossFunctionType,
-                args.learningRate, args.batchSize);
+                args.learningRate, args.numThreads);
     }
 }
