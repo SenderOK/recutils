@@ -1,4 +1,4 @@
-package ru.recutils.trainers;
+package ru.recutils.trainers.regression;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -7,8 +7,8 @@ import java.util.Map;
 import ru.recutils.common.ObservationHolder;
 
 public class RegressionModelWeights implements Serializable {
-    final HashMap<Integer, Double> featureWeights;
-    double bias;
+    public final HashMap<Integer, Double> featureWeights;
+    public double bias;
 
     public RegressionModelWeights() {
         this.featureWeights = new HashMap<>();

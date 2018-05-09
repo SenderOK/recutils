@@ -8,7 +8,7 @@ import java.util.List;
 import com.beust.jcommander.JCommander;
 
 import ru.recutils.cli.CommandLineArguments;
-import ru.recutils.common.BaseLinearTrainerConfig;
+import ru.recutils.trainers.BaseLinearTrainerConfig;
 import ru.recutils.common.HashedLinearModel;
 import ru.recutils.common.HashedLinearModelLoader;
 import ru.recutils.common.LossFunctionType;
@@ -16,15 +16,15 @@ import ru.recutils.common.ModelType;
 import ru.recutils.common.OptimizationAlgorithmType;
 import ru.recutils.exceptions.InvalidHashBitSizeException;
 import ru.recutils.exceptions.ModelNotTrainedException;
-import ru.recutils.trainers.FmModel;
+import ru.recutils.trainers.fm.FmModel;
 import ru.recutils.io.FeatureNameHasher;
 import ru.recutils.io.IterableDataset;
 import ru.recutils.io.SimpleObservationHolder;
 import ru.recutils.io.VwFeatureNameHasher;
 import ru.recutils.io.VwLineParser;
-import ru.recutils.trainers.FmModelConfig;
-import ru.recutils.trainers.RegressionModel;
-import ru.recutils.trainers.RegressionModelConfig;
+import ru.recutils.trainers.fm.FmModelConfig;
+import ru.recutils.trainers.regression.RegressionModel;
+import ru.recutils.trainers.regression.RegressionModelConfig;
 import ru.recutils.trainers.SgdTrainerConfig;
 
 public class RecUtilsMain {

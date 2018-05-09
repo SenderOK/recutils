@@ -1,10 +1,11 @@
-package ru.recutils.trainers;
+package ru.recutils.trainers.regression;
 
 import java.util.Map;
 import java.util.Random;
 
 import ru.recutils.common.ObservationHolder;
 import ru.recutils.lossfuncs.LossFunction;
+import ru.recutils.trainers.SgdTrainerConfig;
 
 public class RegressionSgdTrainer {
     public static <T extends ObservationHolder> void train(

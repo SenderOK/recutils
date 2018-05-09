@@ -1,4 +1,4 @@
-package ru.recutils.trainers;
+package ru.recutils.trainers.regression;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +9,7 @@ import ru.recutils.common.ModelType;
 import ru.recutils.common.ObservationHolder;
 import ru.recutils.io.FeatureNameHasher;
 import ru.recutils.lossfuncs.LossFunction;
+import ru.recutils.trainers.SgdTrainerConfig;
 
 public class RegressionModel<T extends ObservationHolder> implements HashedLinearModel<T> {
     private final FeatureNameHasher featureNameHasher;

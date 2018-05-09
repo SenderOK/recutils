@@ -1,4 +1,4 @@
-package ru.recutils.trainers;
+package ru.recutils.trainers.regression;
 
 import java.io.Serializable;
 

@@ -1,4 +1,4 @@
-package ru.recutils.common;
+package ru.recutils.trainers;
 
 import java.io.Serializable;
 

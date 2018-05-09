@@ -1,4 +1,4 @@
-package ru.recutils.trainers;
+package ru.recutils.trainers.fm;
 
 import java.util.Map;
 import java.util.Random;
@@ -6,6 +6,7 @@ import java.util.Random;
 import ru.recutils.common.MathUtils;
 import ru.recutils.common.ObservationHolder;
 import ru.recutils.lossfuncs.LossFunction;
+import ru.recutils.trainers.SgdTrainerConfig;
 
 public class FmSgdTrainer {
     public static <T extends ObservationHolder> void train(

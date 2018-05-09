@@ -1,14 +1,14 @@
-package ru.recutils.trainers;
+package ru.recutils.trainers.fm;
 
 import java.io.Serializable;
 import java.util.List;
 
-import ru.recutils.common.BaseLinearTrainerConfig;
 import ru.recutils.common.HashedLinearModel;
 import ru.recutils.exceptions.ModelNotTrainedException;
 import ru.recutils.common.ModelType;
 import ru.recutils.common.ObservationHolder;
 import ru.recutils.io.FeatureNameHasher;
+import ru.recutils.trainers.BaseLinearTrainerConfig;
 
 public class FmModel<T extends ObservationHolder> implements HashedLinearModel<T>, Serializable {
     private final FeatureNameHasher featureNameHasher;

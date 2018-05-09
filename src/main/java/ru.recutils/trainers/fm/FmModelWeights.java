@@ -1,4 +1,4 @@
-package ru.recutils.trainers;
+package ru.recutils.trainers.fm;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -8,6 +8,7 @@ import java.util.Set;
 
 import ru.recutils.common.MathUtils;
 import ru.recutils.common.ObservationHolder;
+import ru.recutils.trainers.regression.RegressionModelWeights;
 
 public class FmModelWeights implements Serializable {
     final RegressionModelWeights regressionModelWeights;

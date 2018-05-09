@@ -3,7 +3,6 @@ package ru.recutils.trainers;
 import java.io.Serializable;
 
 import ru.recutils.cli.CommandLineArguments;
-import ru.recutils.common.BaseLinearTrainerConfig;
 import ru.recutils.common.LossFunctionType;
 
 public class SgdTrainerConfig extends BaseLinearTrainerConfig implements Serializable {
