@@ -31,7 +31,6 @@ class RegressionSgdTrainer {
             RegressionModelConfig modelConfig)
     {
         for (int i = 0; i < trainerConfig.numIter; ++i) {
-            dataset.spliterator();
             System.out.println("training epoch #" + i);
 
             DoubleAdder lossSum = new DoubleAdder();
