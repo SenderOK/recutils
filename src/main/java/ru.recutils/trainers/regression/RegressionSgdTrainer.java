@@ -50,8 +50,8 @@ class RegressionSgdTrainer {
                     lossSum.add(loss);
                     objectCount.incrementAndGet();
                 })).get();
-            } catch (Exception e) {
-                System.err.println("Failed to train in parallel");
+            } catch (Exception ex) {
+                ex.printStackTrace();
                 return false;
             }
 
