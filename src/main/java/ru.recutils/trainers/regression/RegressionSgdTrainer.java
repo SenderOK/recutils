@@ -5,6 +5,7 @@ import java.util.Random;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.DoubleAdder;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import ru.recutils.common.ObservationHolder;
@@ -36,8 +37,17 @@ class RegressionSgdTrainer {
             DoubleAdder lossSum = new DoubleAdder();
             AtomicInteger objectCount = new AtomicInteger(0);
             try {
-                forkJoinPool.submit(() -> StreamSupport.stream(dataset.spliterator(), true).forEach(observation -> {
+                Stream<T> dataStream = StreamSupport.stream(dataset.spliterator(), true);
+                if (!dataStream.iterator().hasNext()) {
+                    return false;
+                }
+                forkJoinPool.submit(() -> dataStream.forEach(observation -> {
+                    if (observation == null) {
+                        return;
+                    }
+
                     float loss = updateModelWeightsAndReturnLoss(observation, regressionModelWeights, modelConfig);
+
                     lossSum.add(loss);
                     objectCount.incrementAndGet();
                 })).get();
