@@ -112,7 +112,7 @@ public class RecUtilsMain {
         FeatureNameHasher featureNameHasher = hashedLinearModel.getFeatureNameHasher();
         IterableDataset<SimpleObservationHolder> dataset = new IterableDataset<>(args.testPath,
                 new VwLineParser(featureNameHasher));
-        List<Double> predictions;
+        List<Float> predictions;
         try {
             predictions = hashedLinearModel.predict(dataset);
         } catch (ModelNotTrainedException exception) {
@@ -121,8 +121,8 @@ public class RecUtilsMain {
         }
 
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(args.resultPath))) {
-            for (double prediction : predictions) {
-                bufferedWriter.write(Double.toString(prediction) + "\n");
+            for (float prediction : predictions) {
+                bufferedWriter.write(Float.toString(prediction) + "\n");
             }
         } catch (IOException e) {
             System.err.println("Failed to write predictions");

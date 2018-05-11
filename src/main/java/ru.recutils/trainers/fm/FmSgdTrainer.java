@@ -2,6 +2,8 @@ package ru.recutils.trainers.fm;
 
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.DoubleAdder;
 
 import ru.recutils.common.MathUtils;
 import ru.recutils.common.ObservationHolder;
@@ -22,36 +24,36 @@ public class FmSgdTrainer {
         for (int iter = 0; iter < trainerConfig.numIter; ++iter) {
             System.out.println("training epoch #" + iter);
 
-            double lossSum = 0;
-            int objectCount = 0;
+            DoubleAdder lossSum = new DoubleAdder();
+            AtomicInteger objectCount = new AtomicInteger(0);
             for (T observation : dataset) {
                 // random initialization for new weights
                 for (Integer featureHash : observation.getFeatures().keySet()) {
                     if (!fmModelWeights.regressionModelWeights.featureWeights.containsKey(featureHash)) {
                         fmModelWeights.regressionModelWeights.featureWeights.put(
-                                featureHash, randomGen.nextGaussian() * trainerConfig.initStddev);
+                                featureHash, (float)randomGen.nextGaussian() * trainerConfig.initStddev);
                         fmModelWeights.featureEmbeddings.put(featureHash, MathUtils.getRandomGaussianArray(randomGen,
                                 trainerConfig.initStddev, embeddingSize));
                     }
                 }
 
-                double prediction = fmModelWeights.apply(observation);
-                double label = observation.getLabel();
-                double importance = observation.getImportance();
-                double dLdp = lossFunction.derivative(prediction, label);
+                float prediction = fmModelWeights.apply(observation);
+                float label = observation.getLabel();
+                float importance = observation.getImportance();
+                float dLdp = lossFunction.derivative(prediction, label);
 
-                lossSum += lossFunction.value(prediction, label);
-                ++objectCount;
+                lossSum.add(lossFunction.value(prediction, label));
+                objectCount.incrementAndGet();
 
                 // updating bias
                 fmModelWeights.regressionModelWeights.bias -= trainerConfig.learningRate *
                         lossFunction.derivative(prediction, label);
 
                 // precalculating weighted sum of embedding vectors
-                double[] weightedEmbeddingsSum = new double[embeddingSize];
-                for (Map.Entry<Integer, Double> entry : observation.getFeatures().entrySet()) {
+                float[] weightedEmbeddingsSum = new float[embeddingSize];
+                for (Map.Entry<Integer, Float> entry : observation.getFeatures().entrySet()) {
                     int featureHash = entry.getKey();
-                    double featureValue = entry.getValue();
+                    float featureValue = entry.getValue();
 
                     MathUtils.inplaceAddWithScale(
                             weightedEmbeddingsSum,
@@ -61,12 +63,12 @@ public class FmSgdTrainer {
                     );
                 }
 
-                for (Map.Entry<Integer, Double> entry : observation.getFeatures().entrySet()) {
+                for (Map.Entry<Integer, Float> entry : observation.getFeatures().entrySet()) {
                     int featureHash = entry.getKey();
-                    double featureValue = entry.getValue();
+                    float featureValue = entry.getValue();
 
                     // updating weight
-                    double weightGradient = dLdp * featureValue + modelConfig.featureWeightsRegularizer
+                    float weightGradient = dLdp * featureValue + modelConfig.featureWeightsRegularizer
                             * fmModelWeights.regressionModelWeights.featureWeights.get(featureHash);
                     fmModelWeights.regressionModelWeights.featureWeights.merge(
                             featureHash,
@@ -75,8 +77,8 @@ public class FmSgdTrainer {
                     );
 
                     // updating embedding
-                    double[] embeddingToUpdate = fmModelWeights.featureEmbeddings.get(featureHash);
-                    double[] dLde = weightedEmbeddingsSum.clone();
+                    float[] embeddingToUpdate = fmModelWeights.featureEmbeddings.get(featureHash);
+                    float[] dLde = weightedEmbeddingsSum.clone();
                     MathUtils.inplaceAddWithScale(dLde, embeddingToUpdate, -featureValue, embeddingSize);
                     MathUtils.inplaceScale(dLde, dLdp * featureValue);
                     MathUtils.inplaceAddWithScale(dLde, embeddingToUpdate, modelConfig.embeddingsRegularizer,
@@ -86,7 +88,12 @@ public class FmSgdTrainer {
                 }
             }
 
-            System.out.println("Average loss on " + objectCount + " objects is " + lossSum / objectCount);
+            if (objectCount.get() > 0) {
+                System.out.println("Average loss on " + objectCount + " objects is "
+                        + lossSum.sum() / objectCount.get());
+            } else {
+                System.out.println("No objects processed");
+            }
         }
     }
 }

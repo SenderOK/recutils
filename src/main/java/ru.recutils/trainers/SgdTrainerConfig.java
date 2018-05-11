@@ -8,13 +8,13 @@ import ru.recutils.common.OptimizationAlgorithmType;
 
 public class SgdTrainerConfig extends BaseLinearTrainerConfig implements Serializable {
     public final LossFunctionType lossFunctionType;
-    public final double learningRate;
+    public final float learningRate;
     public final int numThreads;
 
     public SgdTrainerConfig(
             BaseLinearTrainerConfig config,
             LossFunctionType lossFunctionType,
-            double learningRate,
+            float learningRate,
             int numThreads)
     {
         super(config);

@@ -11,7 +11,7 @@ import ru.recutils.io.FeatureNameHasher;
 public interface HashedLinearModel<ObservationT> extends Serializable {
     void fit(Iterable<ObservationT> dataset);
 
-    List<Double> predict(Iterable<ObservationT> dataset) throws ModelNotTrainedException;
+    List<Float> predict(Iterable<ObservationT> dataset) throws ModelNotTrainedException;
 
     ModelType getModelType();
 

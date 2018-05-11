@@ -6,10 +6,10 @@ import ru.recutils.cli.CommandLineArguments;
 
 public class FmModelConfig implements Serializable {
     public final int dimension;
-    public final double featureWeightsRegularizer;
-    public final double embeddingsRegularizer;
+    public final float featureWeightsRegularizer;
+    public final float embeddingsRegularizer;
 
-    public FmModelConfig(int dimension, double featureWeightsRegularizer, double embeddingsRegularizer) {
+    public FmModelConfig(int dimension, float featureWeightsRegularizer, float embeddingsRegularizer) {
         this.dimension = dimension;
         this.featureWeightsRegularizer = featureWeightsRegularizer;
         this.embeddingsRegularizer = embeddingsRegularizer;

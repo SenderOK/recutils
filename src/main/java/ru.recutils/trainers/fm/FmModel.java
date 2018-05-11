@@ -45,7 +45,7 @@ public class FmModel<T extends ObservationHolder> implements HashedLinearModel<T
     }
 
     @Override
-    public List<Double> predict(Iterable<T> dataset) throws ModelNotTrainedException {
+    public List<Float> predict(Iterable<T> dataset) throws ModelNotTrainedException {
         if (!wasTrained) {
             throw new ModelNotTrainedException();
         }
@@ -53,11 +53,11 @@ public class FmModel<T extends ObservationHolder> implements HashedLinearModel<T
                 ? ((SgdTrainerConfig) trainerConfig).lossFunctionType.getLossFunction()
                 : LossFunctionType.MSE.getLossFunction();
 
-        List<Double> result = new ArrayList<>();
-        double lossSum = 0;
+        List<Float> result = new ArrayList<>();
+        float lossSum = 0;
         int objectCount = 0;
         for (ObservationHolder observation : dataset) {
-            double prediction = modelWeights.apply(observation);
+            float prediction = modelWeights.apply(observation);
             lossSum += lossFunction.value(prediction, observation.getLabel());
             ++objectCount;
             result.add(prediction);

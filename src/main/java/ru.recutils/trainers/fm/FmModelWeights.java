@@ -12,7 +12,7 @@ import ru.recutils.trainers.regression.RegressionModelWeights;
 
 public class FmModelWeights implements Serializable {
     final RegressionModelWeights regressionModelWeights;
-    final HashMap<Integer, double[]> featureEmbeddings;
+    final HashMap<Integer, float[]> featureEmbeddings;
     final int embeddingsSize;
 
     public FmModelWeights(int embeddingsSize) {
@@ -21,8 +21,8 @@ public class FmModelWeights implements Serializable {
         this.embeddingsSize = embeddingsSize;
     }
 
-    public double apply(ObservationHolder observationHolder) {
-        double result = regressionModelWeights.apply(observationHolder);
+    public float apply(ObservationHolder observationHolder) {
+        float result = regressionModelWeights.apply(observationHolder);
 
         Set<Integer> featureSet = observationHolder.getFeatures().keySet();
         List<Integer> features =  new ArrayList<Integer>(featureSet);
@@ -30,12 +30,12 @@ public class FmModelWeights implements Serializable {
             if (!featureEmbeddings.containsKey(features.get(i))) {
                 continue;
             }
-            double[] firstEmbedding = featureEmbeddings.get(features.get(i));
+            float[] firstEmbedding = featureEmbeddings.get(features.get(i));
             for (int j = i + 1; j < features.size(); ++j) {
                 if (!featureEmbeddings.containsKey(features.get(j))) {
                     continue;
                 }
-                double[] secondEmbedding = featureEmbeddings.get(features.get(j));
+                float[] secondEmbedding = featureEmbeddings.get(features.get(j));
                 result += MathUtils.dotProduct(firstEmbedding, secondEmbedding, embeddingsSize);
             }
         }

@@ -5,9 +5,9 @@ import java.io.Serializable;
 import ru.recutils.cli.CommandLineArguments;
 
 public class RegressionModelConfig implements Serializable {
-    public final double featureWeightsRegularizer;
+    public final float featureWeightsRegularizer;
 
-    public RegressionModelConfig(double featureWeightsRegularizer) {
+    public RegressionModelConfig(float featureWeightsRegularizer) {
         this.featureWeightsRegularizer = featureWeightsRegularizer;
     }
 

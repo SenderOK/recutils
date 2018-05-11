@@ -2,12 +2,12 @@ package ru.recutils.lossfuncs;
 
 public class SquaredLoss implements LossFunction {
     @Override
-    public double value(double prediction, double gt) {
+    public float value(float prediction, float gt) {
         return (prediction - gt) * (prediction - gt);
     }
 
     @Override
-    public double derivative(double prediction, double gt) {
+    public float derivative(float prediction, float gt) {
         return 2 * (prediction - gt);
     }
 }

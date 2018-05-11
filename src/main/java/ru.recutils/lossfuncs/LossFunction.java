@@ -1,7 +1,7 @@
 package ru.recutils.lossfuncs;
 
 public interface LossFunction {
-    double value(double prediction, double gt);
+    float value(float prediction, float gt);
 
-    double derivative(double prediction, double gt);
+    float derivative(float prediction, float gt);
 }

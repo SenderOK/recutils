@@ -12,11 +12,11 @@ public class VwLineParserTest extends TestCase {
         VwFeatureNameHasher hasher = VwFeatureNameHasher.getHasher(20);
         VwLineParser parser = new VwLineParser(hasher);
         SimpleObservationHolder holder = parser.convert("-2\t20.0  | f1:15 f2:43");
-        Map<Integer, Double> features = holder.getFeatures();
-        Assert.assertEquals(features.get(hasher.getHash("f1")), 15.0);
-        Assert.assertEquals(features.get(hasher.getHash("f2")), 43.0);
-        Assert.assertEquals(holder.getLabel(), -2.0);
-        Assert.assertEquals(holder.getImportance(), 20.0);
+        Map<Integer, Float> features = holder.getFeatures();
+        Assert.assertEquals(features.get(hasher.getHash("f1")), 15.0f);
+        Assert.assertEquals(features.get(hasher.getHash("f2")), 43.0f);
+        Assert.assertEquals(holder.getLabel(), -2.0f);
+        Assert.assertEquals(holder.getImportance(), 20.0f);
         System.out.println(holder.getFeatures());
     }
 
@@ -24,10 +24,10 @@ public class VwLineParserTest extends TestCase {
         VwFeatureNameHasher hasher = VwFeatureNameHasher.getHasher(20);
         VwLineParser parser = new VwLineParser(hasher);
         SimpleObservationHolder holder = parser.convert("1  |  f1");
-        Map<Integer, Double> features = holder.getFeatures();
-        Assert.assertEquals(features.get(hasher.getHash("f1")), 1.0);
-        Assert.assertEquals(holder.getLabel(), 1.0);
-        Assert.assertEquals(holder.getImportance(), 1.0);
+        Map<Integer, Float> features = holder.getFeatures();
+        Assert.assertEquals(features.get(hasher.getHash("f1")), 1.0f);
+        Assert.assertEquals(holder.getLabel(), 1.0f);
+        Assert.assertEquals(holder.getImportance(), 1.0f);
         System.out.println(holder.getFeatures());
     }
 

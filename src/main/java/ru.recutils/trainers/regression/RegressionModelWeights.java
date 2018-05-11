@@ -1,31 +1,31 @@
 package ru.recutils.trainers.regression;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import ru.recutils.common.ObservationHolder;
 
 public class RegressionModelWeights implements Serializable {
-    public final HashMap<Integer, Double> featureWeights;
-    public double bias;
+    public final ConcurrentHashMap<Integer, Float> featureWeights;
+    public float bias;
 
     public RegressionModelWeights() {
-        this.featureWeights = new HashMap<>();
-        this.bias = 0;
+        this.featureWeights = new ConcurrentHashMap<>();
+        this.bias = 0.0f;
     }
 
-    public double apply(ObservationHolder observationHolder) {
-        Map<Integer, Double> scanMap = observationHolder.getFeatures();
-        Map<Integer, Double> lookupMap = featureWeights;
+    public float apply(ObservationHolder observationHolder) {
+        Map<Integer, Float> scanMap = observationHolder.getFeatures();
+        Map<Integer, Float> lookupMap = featureWeights;
         if (scanMap.size() > lookupMap.size()) {
             scanMap = featureWeights;
             lookupMap = observationHolder.getFeatures();
         }
 
-        double result = bias;
-        for (Map.Entry<Integer, Double> entry : scanMap.entrySet()) {
-            result += lookupMap.getOrDefault(entry.getKey(), 0.0) * entry.getValue();
+        float result = bias;
+        for (Map.Entry<Integer, Float> entry : scanMap.entrySet()) {
+            result += lookupMap.getOrDefault(entry.getKey(), 0.0f) * entry.getValue();
         }
         return result;
     }

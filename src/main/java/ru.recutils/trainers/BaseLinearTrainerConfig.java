@@ -7,10 +7,10 @@ import ru.recutils.common.OptimizationAlgorithmType;
 
 public class BaseLinearTrainerConfig implements Serializable {
     public final long seed;
-    public final double initStddev;
+    public final float initStddev;
     public final int numIter;
 
-    public BaseLinearTrainerConfig(long seed, double initStddev, int numIter) {
+    public BaseLinearTrainerConfig(long seed, float initStddev, int numIter) {
         this.seed = seed;
         this.initStddev = initStddev;
         this.numIter = numIter;

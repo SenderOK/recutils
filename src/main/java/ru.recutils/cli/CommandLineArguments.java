@@ -35,17 +35,17 @@ public class CommandLineArguments {
             description = "SGD, ALS (only for FM and FFM models) (case insensitive)")
     public OptimizationAlgorithmType optimizationAlgorithmType = OptimizationAlgorithmType.SGD;
 
-    @Parameter(names = {"-l2"}, validateWith = PositiveDouble.class,
+    @Parameter(names = {"-l2"}, validateWith = PositiveFloat.class,
             description = "l2 regularizer for feature weights")
-    public double featureWeightsRegularizer = 0.1;
+    public float featureWeightsRegularizer = 0.1f;
 
-    @Parameter(names = {"-l2e"}, validateWith = PositiveDouble.class,
+    @Parameter(names = {"-l2e"}, validateWith = PositiveFloat.class,
             description = "l2 regularizer for feature embeddings (only for FM and FFM models)")
-    public double embeddingsRegularizer = 0.1;
+    public float embeddingsRegularizer = 0.1f;
 
-    @Parameter(names = {"-r", "--learning-rate"}, validateWith = PositiveDouble.class,
+    @Parameter(names = {"-r", "--learning-rate"}, validateWith = PositiveFloat.class,
             description = "learning rate (for SGD training)")
-    public double learningRate = 0.01;
+    public float learningRate = 0.01f;
 
     @Parameter(names = {"-iter"}, validateWith = PositiveInteger.class,
             description = "dataset passes for SGD, number of iterations for ALS training")
@@ -63,9 +63,9 @@ public class CommandLineArguments {
             description = "number of threads (using Hogwild! for SGD training)")
     public int numThreads = 1;
 
-    @Parameter(names={"-init", "--init-stddev"}, validateWith = PositiveDouble.class,
+    @Parameter(names={"-init", "--init-stddev"}, validateWith = PositiveFloat.class,
             description = "standard deviation for initial weights")
-    public double initStddev = 0.1;
+    public float initStddev = 0.1f;
 
     @Parameter(names={"-s", "--seed"}, description = "random seed for training")
     public long seed = 42;

@@ -32,8 +32,7 @@ public class RegressionModel<T extends ObservationHolder> implements HashedLinea
 
     @Override
     public void fit(Iterable<T> dataset) {
-        RegressionSgdTrainer.train(dataset, modelWeights, regressionModelConfig, sgdTrainerConfig);
-        this.wasTrained = true;
+        this.wasTrained = new RegressionSgdTrainer(sgdTrainerConfig).train(dataset, modelWeights, regressionModelConfig);
     }
 
     @Override
@@ -47,16 +46,16 @@ public class RegressionModel<T extends ObservationHolder> implements HashedLinea
     }
 
     @Override
-    public List<Double> predict(Iterable<T> dataset) throws ModelNotTrainedException {
+    public List<Float> predict(Iterable<T> dataset) throws ModelNotTrainedException {
         if (!wasTrained) {
             throw new ModelNotTrainedException();
         }
-        List<Double> result = new ArrayList<>();
-        double lossSum = 0;
+        List<Float> result = new ArrayList<>();
+        float lossSum = 0;
         int objectCount = 0;
         LossFunction lossFunction = sgdTrainerConfig.lossFunctionType.getLossFunction();
         for (ObservationHolder observation : dataset) {
-            double prediction = modelWeights.apply(observation);
+            float prediction = modelWeights.apply(observation);
             lossSum += lossFunction.value(prediction, observation.getLabel());
             ++objectCount;
             result.add(prediction);

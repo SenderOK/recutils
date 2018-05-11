@@ -21,12 +21,12 @@ public class VwLineParser implements StringToFeaturesHolderConverter<SimpleObser
             throw new DatasetLineParsingException("Invalid line format");
         }
 
-        double label = Double.parseDouble(features[0]);
+        float label = Float.parseFloat(features[0]);
 
         int currIndex = 1;
-        double importance = 1.0;
+        float importance = 1.0f;
         if (!features[1].equals("|")) {
-            importance = Double.parseDouble(features[1]);
+            importance = Float.parseFloat(features[1]);
             currIndex = 2;
         }
 
@@ -34,7 +34,7 @@ public class VwLineParser implements StringToFeaturesHolderConverter<SimpleObser
             throw new DatasetLineParsingException("'|' symbol expected before the features");
         }
 
-        HashMap<Integer, Double> featureWeights = new HashMap<>(features.length - currIndex - 1);
+        HashMap<Integer, Float> featureWeights = new HashMap<>(features.length - currIndex - 1);
         for (int i = currIndex + 1; i < features.length; ++i) {
             String[] featureParts = features[i].split(":");
 
@@ -42,7 +42,7 @@ public class VwLineParser implements StringToFeaturesHolderConverter<SimpleObser
                 throw new DatasetLineParsingException("Invalid features format : '" + features[i] + "'");
             }
 
-            double featureValue = (featureParts.length == 2) ? Double.parseDouble(featureParts[1]) : 1.0;
+            float featureValue = (featureParts.length == 2) ? Float.parseFloat(featureParts[1]) : 1.0f;
             featureWeights.merge(featureNameHasher.getHash(featureParts[0]), featureValue, (a, b) -> a + b);
         }
 
