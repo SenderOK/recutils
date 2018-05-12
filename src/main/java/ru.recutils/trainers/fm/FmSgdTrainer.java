@@ -75,15 +75,9 @@ public class FmSgdTrainer<T extends ObservationHolder> extends SgdTrainer<T, FmM
             float[] dLde = weightedEmbeddingsSum.clone();
             Utils.inplaceAddWithScale(dLde, embeddingToUpdate, -featureValue, embeddingSize);
             Utils.inplaceScale(dLde, dLdp * featureValue);
-            Utils.inplaceAddWithScale(dLde, embeddingToUpdate, modelConfig.embeddingsRegularizer,
-                    embeddingSize);
+            Utils.inplaceAddWithScale(dLde, embeddingToUpdate, modelConfig.embeddingsRegularizer, embeddingSize);
             Utils.inplaceScale(dLde, -trainerConfig.learningRate * importance);
-
-            modelWeights.featureEmbeddings.merge(
-                    featureHash,
-                    dLde,
-                    (a, b) -> Utils.add(a, b)
-            );
+            modelWeights.featureEmbeddings.merge(featureHash, dLde, (a, b) -> Utils.add(a, b));
         }
 
         return loss;

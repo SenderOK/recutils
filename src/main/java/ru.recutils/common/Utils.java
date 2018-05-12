@@ -91,4 +91,8 @@ public class Utils {
         }
         return result;
     }
+
+    public static float l2normSquared(float[] a) {
+        return dotProduct(a, a, a.length);
+    }
 }

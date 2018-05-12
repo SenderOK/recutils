@@ -1,9 +1,7 @@
 package ru.recutils.trainers.fm;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import ru.recutils.common.LinearModelWeights;
@@ -26,21 +24,18 @@ public class FmModelWeights implements LinearModelWeights, Serializable {
     public float apply(ObservationHolder observationHolder) {
         float result = regressionModelWeights.apply(observationHolder);
 
-        Set<Integer> featureSet = observationHolder.getFeatures().keySet();
-        List<Integer> features =  new ArrayList<Integer>(featureSet);
-        for (int i = 0; i < features.size(); ++i) {
-            if (!featureEmbeddings.containsKey(features.get(i))) {
+        float[] linearCombination = new float[embeddingsSize];
+        float squaredNormsSum = 0.0f;
+        for (Map.Entry<Integer, Float> entry : observationHolder.getFeatures().entrySet()) {
+            int featureHash = entry.getKey();
+            float featureValue = entry.getValue();
+            if (!featureEmbeddings.containsKey(featureHash)) {
                 continue;
             }
-            float[] firstEmbedding = featureEmbeddings.get(features.get(i));
-            for (int j = i + 1; j < features.size(); ++j) {
-                if (!featureEmbeddings.containsKey(features.get(j))) {
-                    continue;
-                }
-                float[] secondEmbedding = featureEmbeddings.get(features.get(j));
-                result += Utils.dotProduct(firstEmbedding, secondEmbedding, embeddingsSize);
-            }
+            float[] embedding = featureEmbeddings.get(featureHash).clone();
+            Utils.inplaceAddWithScale(linearCombination, embedding, featureValue, embeddingsSize);
+            squaredNormsSum += Utils.l2normSquared(embedding) * featureValue * featureValue;
         }
-        return result;
+        return result + 0.5f * (Utils.l2normSquared(linearCombination) - squaredNormsSum);
     }
 }
