@@ -1,5 +1,6 @@
 package ru.recutils.trainers.regression;
 
+import java.io.IOException;
 import java.util.List;
 
 import ru.recutils.common.HashedLinearModel;
@@ -31,7 +32,7 @@ public class RegressionModel<T extends ObservationHolder> implements HashedLinea
     }
 
     @Override
-    public void fit(String dataPath) {
+    public void fit(String dataPath) throws IOException {
         this.wasTrained = new RegressionSgdTrainer<T>(sgdTrainerConfig, stringToFeaturesHolderConverter)
                 .train(dataPath, modelWeights, regressionModelConfig);
     }
@@ -42,7 +43,7 @@ public class RegressionModel<T extends ObservationHolder> implements HashedLinea
     }
 
     @Override
-    public List<Float> predict(String dataPath) throws ModelNotTrainedException {
+    public List<Float> predict(String dataPath) throws ModelNotTrainedException, IOException {
         if (!wasTrained) {
             throw new ModelNotTrainedException();
         }

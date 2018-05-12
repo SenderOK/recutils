@@ -27,7 +27,7 @@ import ru.recutils.trainers.regression.RegressionModelConfig;
 import ru.recutils.trainers.SgdTrainerConfig;
 
 public class RecUtilsMain {
-    public static void main(String[] args) throws InvalidHashBitSizeException {
+    public static void main(String[] args) throws InvalidHashBitSizeException, IOException {
         CommandLineArguments commandLineArguments = new CommandLineArguments();
         JCommander jCommander = new JCommander(commandLineArguments);
         jCommander.setCaseSensitiveOptions(false);
@@ -57,7 +57,7 @@ public class RecUtilsMain {
         }
     }
 
-    private static void doTrain(CommandLineArguments args) throws InvalidHashBitSizeException {
+    private static void doTrain(CommandLineArguments args) throws InvalidHashBitSizeException, IOException {
         if (args.modelType == ModelType.REGRESSION && args.optimizationAlgorithmType != OptimizationAlgorithmType.SGD) {
             System.out.println("for regression task only sgd is available, will use sgd");
         }
@@ -75,7 +75,7 @@ public class RecUtilsMain {
             SgdTrainerConfig sgdTrainerConfig = SgdTrainerConfig.fromCommandLineArguments(args);
             hashedLinearModel = new RegressionModel<SimpleObservationHolder>(
                     new VwLineParser(featureNameHasher), regressionModelConfig, sgdTrainerConfig);
-        } else if (args.modelType == ModelType.FM) {
+        } else { // ModelType.FM
             FmModelConfig fmModelConfig = FmModelConfig.fromCommandLineArguments(args);
             BaseLinearTrainerConfig linearTrainerConfig;
             if (args.optimizationAlgorithmType == OptimizationAlgorithmType.SGD) {
@@ -85,10 +85,8 @@ public class RecUtilsMain {
             }
             hashedLinearModel = new FmModel<SimpleObservationHolder>(
                     new VwLineParser(featureNameHasher), fmModelConfig, linearTrainerConfig);
-        } else {
-            System.err.println("FFM is not implemented yet");
-            return;
         }
+
         hashedLinearModel.fit(args.trainPath);
 
         System.out.println("Fit model on file " + args.trainPath);
@@ -98,7 +96,7 @@ public class RecUtilsMain {
         System.out.println("Dumped the model to " + args.modelPath);
     }
 
-    private static void doTest(CommandLineArguments args) {
+    private static void doTest(CommandLineArguments args) throws IOException {
         HashedLinearModel hashedLinearModel = HashedLinearModelLoader.load(args.modelPath);
         if (hashedLinearModel == null) {
             System.err.println("Failed to load the model");
@@ -117,8 +115,6 @@ public class RecUtilsMain {
             for (float prediction : predictions) {
                 bufferedWriter.write(Float.toString(prediction) + "\n");
             }
-        } catch (IOException e) {
-            System.err.println("Failed to write predictions");
         }
 
         System.out.println("Successfully wrote the predictions to " + args.resultPath);

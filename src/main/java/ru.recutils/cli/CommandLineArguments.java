@@ -28,11 +28,11 @@ public class CommandLineArguments {
     public LossFunctionType lossFunctionType = LossFunctionType.MSE;
 
     @Parameter(names={"-mt", "--model-type"}, converter = ModelTypeConverter.class,
-            description = "model type: REG, FM, FFM (case insensitive)")
+            description = "model type: REG, FM (case insensitive)")
     public ModelType modelType = ModelType.REGRESSION;
 
     @Parameter(names={"-opt", "--optimizer"}, converter = OptimizationAlgorithmTypeConverter.class,
-            description = "SGD, ALS (only for FM and FFM models) (case insensitive)")
+            description = "SGD, ALS (only for FM model) (case insensitive)")
     public OptimizationAlgorithmType optimizationAlgorithmType = OptimizationAlgorithmType.SGD;
 
     @Parameter(names = {"-l2"}, validateWith = PositiveFloat.class,
@@ -40,7 +40,7 @@ public class CommandLineArguments {
     public float featureWeightsRegularizer = 0.1f;
 
     @Parameter(names = {"-l2e"}, validateWith = PositiveFloat.class,
-            description = "l2 regularizer for feature embeddings (only for FM and FFM models)")
+            description = "l2 regularizer for feature embeddings (only for FM model)")
     public float embeddingsRegularizer = 0.1f;
 
     @Parameter(names = {"-r", "--learning-rate"}, validateWith = PositiveFloat.class,
@@ -56,7 +56,7 @@ public class CommandLineArguments {
     public int hashingBits = 18;
 
     @Parameter(names={"-d", "--dimension"}, validateWith = PositiveInteger.class,
-            description = "embeddings dimensionality in FM and FFM (for training)")
+            description = "embeddings dimensionality in FM (for training)")
     public int dimension = 20;
 
     @Parameter(names={"-t", "--threads"}, validateWith = PositiveInteger.class,
@@ -69,4 +69,7 @@ public class CommandLineArguments {
 
     @Parameter(names={"-s", "--seed"}, description = "random seed for training")
     public long seed = 42;
+
+    @Parameter(names={"-h", "--holdout"}, description = "10% of training is used only for validation")
+    public boolean useHoldout = false;
 }

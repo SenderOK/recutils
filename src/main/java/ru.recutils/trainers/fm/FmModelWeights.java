@@ -2,6 +2,7 @@ package ru.recutils.trainers.fm;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 import ru.recutils.common.LinearModelWeights;
@@ -37,5 +38,16 @@ public class FmModelWeights implements LinearModelWeights, Serializable {
             squaredNormsSum += Utils.l2normSquared(embedding) * featureValue * featureValue;
         }
         return result + 0.5f * (Utils.l2normSquared(linearCombination) - squaredNormsSum);
+    }
+
+    public void initializeZeroWeights(ObservationHolder observation, Random randomGen, float stddev) {
+        for (Integer featureHash : observation.getFeatures().keySet()) {
+            if (!regressionModelWeights.featureWeights.containsKey(featureHash)) {
+                regressionModelWeights.featureWeights.put(featureHash, (float) randomGen.nextGaussian() * stddev);
+            }
+            if (!featureEmbeddings.containsKey(featureHash)) {
+                featureEmbeddings.put(featureHash, Utils.getRandomGaussianArray(randomGen, stddev, embeddingsSize));
+            }
+        }
     }
 }

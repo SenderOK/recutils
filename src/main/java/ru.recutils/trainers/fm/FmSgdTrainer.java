@@ -20,18 +20,7 @@ public class FmSgdTrainer<T extends ObservationHolder> extends SgdTrainer<T, FmM
     @Override
     public float updateModelWeightsAndReturnLoss(T observation, FmModelWeights modelWeights, FmModelConfig modelConfig) {
         int embeddingSize = modelConfig.dimension;
-
-        // random initialization for new weights
-        for (Integer featureHash : observation.getFeatures().keySet()) {
-            if (!modelWeights.regressionModelWeights.featureWeights.containsKey(featureHash)) {
-                modelWeights.regressionModelWeights.featureWeights.put(
-                        featureHash, (float) randomGen.nextGaussian() * trainerConfig.initStddev);
-            }
-            if (!modelWeights.featureEmbeddings.containsKey(featureHash)) {
-                modelWeights.featureEmbeddings.put(featureHash, Utils.getRandomGaussianArray(randomGen,
-                        trainerConfig.initStddev, embeddingSize));
-            }
-        }
+        modelWeights.initializeZeroWeights(observation, randomGen, trainerConfig.initStddev);
 
         float prediction = modelWeights.apply(observation);
         float label = observation.getLabel();

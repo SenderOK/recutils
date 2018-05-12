@@ -1,8 +1,10 @@
 package ru.recutils.trainers;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.DoubleAdder;
@@ -31,7 +33,7 @@ public abstract class SgdTrainer<T extends ObservationHolder, ModelWeightsT, Mod
         this.stringToFeaturesHolderConverter = stringToFeaturesHolderConverter;
     }
 
-    public boolean train(String dataPath, ModelWeightsT modelWeights, ModelConfigT modelConfig) {
+    public boolean train(String dataPath, ModelWeightsT modelWeights, ModelConfigT modelConfig) throws IOException {
         for (int i = 0; i < trainerConfig.numIter; ++i) {
             System.out.println("training epoch #" + i);
 
@@ -51,8 +53,9 @@ public abstract class SgdTrainer<T extends ObservationHolder, ModelWeightsT, Mod
                     lossSum.add(loss);
                     objectCount.incrementAndGet();
                 })).get();
-            } catch (Exception ex) {
+            } catch (ExecutionException|InterruptedException ex) {
                 ex.printStackTrace();
+                System.exit(1);
                 return false;
             }
 

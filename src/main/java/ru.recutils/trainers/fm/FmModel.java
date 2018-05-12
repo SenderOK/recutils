@@ -1,5 +1,6 @@
 package ru.recutils.trainers.fm;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 
@@ -14,7 +15,6 @@ import ru.recutils.io.StringToFeaturesHolderConverter;
 import ru.recutils.lossfuncs.LossFunction;
 import ru.recutils.trainers.BaseLinearTrainerConfig;
 import ru.recutils.trainers.SgdTrainerConfig;
-
 
 public class FmModel<T extends ObservationHolder> implements HashedLinearModel, Serializable {
     private final StringToFeaturesHolderConverter<T> stringToFeaturesHolderConverter;
@@ -36,18 +36,18 @@ public class FmModel<T extends ObservationHolder> implements HashedLinearModel, 
     }
 
     @Override
-    public void fit(String dataPath) {
+    public void fit(String dataPath) throws IOException {
         if (trainerConfig.getOptimizationType() == OptimizationAlgorithmType.SGD) {
             this.wasTrained = new FmSgdTrainer<T>((SgdTrainerConfig) trainerConfig, stringToFeaturesHolderConverter)
                     .train(dataPath, modelWeights, fmModelConfig);
         } else {
-            FmAlsTrainer.train(dataPath, modelWeights, fmModelConfig, trainerConfig);
+            this.wasTrained = new FmAlsTrainer<T>(trainerConfig, stringToFeaturesHolderConverter)
+                    .train(dataPath, modelWeights, fmModelConfig);
         }
-        this.wasTrained = true;
     }
 
     @Override
-    public List<Float> predict(String dataPath) throws ModelNotTrainedException {
+    public List<Float> predict(String dataPath) throws ModelNotTrainedException, IOException {
         if (!wasTrained) {
             throw new ModelNotTrainedException();
         }

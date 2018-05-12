@@ -12,6 +12,7 @@ public class HashedLinearModelLoader {
             return (HashedLinearModel) objectInputStream.readObject();
         } catch (Exception ex) {
             ex.printStackTrace();
+            System.exit(1);
         }
         return null;
     }

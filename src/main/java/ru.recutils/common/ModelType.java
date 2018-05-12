@@ -2,8 +2,7 @@ package ru.recutils.common;
 
 public enum ModelType {
     REGRESSION("reg"),
-    FM("fm"),
-    FFM("ffm")
+    FM("fm")
     ;
 
     private String name;
