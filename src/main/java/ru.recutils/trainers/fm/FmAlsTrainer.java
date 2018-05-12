@@ -48,6 +48,7 @@ public class FmAlsTrainer<T extends ObservationHolder> {
                 return;
             }
 
+            int index = i.get();
             modelWeights.initializeZeroWeights(observation, randomGen, trainerConfig.initStddev);
             errors.add(modelWeights.apply(observation) - observation.getLabel());
 
@@ -65,8 +66,10 @@ public class FmAlsTrainer<T extends ObservationHolder> {
                 );
 
                 // updating inverted index of observations
-                featureHashToObservations.computeIfAbsent(featureHash, v -> new ArrayList<>())
-                        .add(new Pair<>(i.get(), featureValue));
+                if (!trainerConfig.useHoldout || index % 10 != 0) {
+                    featureHashToObservations.computeIfAbsent(featureHash, v -> new ArrayList<>())
+                            .add(new Pair<>(index, featureValue));
+                }
             }
             weightedEmbeddingsSums.add(weightedEmbeddingsSum);
             i.incrementAndGet();
@@ -79,7 +82,7 @@ public class FmAlsTrainer<T extends ObservationHolder> {
             alsStep(modelWeights, modelConfig, featureHashToObservations, errors, weightedEmbeddingsSums);
             System.out.print("Total loss: " + getMSE(errors, false));
             if (trainerConfig.useHoldout) {
-                System.out.print("Holdout loss: " + getMSE(errors, true));
+                System.out.print(" Holdout loss: " + getMSE(errors, true));
             }
             System.out.println("");
         }
@@ -134,9 +137,6 @@ public class FmAlsTrainer<T extends ObservationHolder> {
             int trainObservations = 0;
             for (Pair<Integer, Float> objectIndexFeatureValuePair : entry.getValue()) {
                 int objectIdx = objectIndexFeatureValuePair.getKey();
-                if (trainerConfig.useHoldout && objectIdx % 10 == 0) {
-                    continue;
-                }
                 float featureValue = objectIndexFeatureValuePair.getValue();
 
                 numerator += (errors.get(objectIdx) - oldWeight * featureValue) * featureValue;
@@ -173,9 +173,6 @@ public class FmAlsTrainer<T extends ObservationHolder> {
                 int trainObservations = 0;
                 for (Pair<Integer, Float> objectIndexFeatureValuePair : entry.getValue()) {
                     int objectIndex = objectIndexFeatureValuePair.getKey();
-                    if (trainerConfig.useHoldout && objectIndex % 10 == 0) {
-                        continue;
-                    }
                     float featureValue = objectIndexFeatureValuePair.getValue();
                     float h = (weightedEmbeddingSums.get(objectIndex)[dim] - oldWeight * featureValue) * oldWeight;
 
