@@ -26,6 +26,8 @@ public class FmSgdTrainer<T extends ObservationHolder> extends SgdTrainer<T, FmM
             if (!modelWeights.regressionModelWeights.featureWeights.containsKey(featureHash)) {
                 modelWeights.regressionModelWeights.featureWeights.put(
                         featureHash, (float) randomGen.nextGaussian() * trainerConfig.initStddev);
+            }
+            if (!modelWeights.featureEmbeddings.containsKey(featureHash)) {
                 modelWeights.featureEmbeddings.put(featureHash, Utils.getRandomGaussianArray(randomGen,
                         trainerConfig.initStddev, embeddingSize));
             }
