@@ -23,10 +23,12 @@ public class FmSgdTrainer<T extends ObservationHolder> extends SgdTrainer<T, FmM
 
         // random initialization for new weights
         for (Integer featureHash : observation.getFeatures().keySet()) {
-            modelWeights.regressionModelWeights.featureWeights.putIfAbsent(
-                    featureHash, (float)randomGen.nextGaussian() * trainerConfig.initStddev);
-            modelWeights.featureEmbeddings.putIfAbsent(featureHash, Utils.getRandomGaussianArray(randomGen,
+            if (!modelWeights.regressionModelWeights.featureWeights.containsKey(featureHash)) {
+                modelWeights.regressionModelWeights.featureWeights.put(
+                        featureHash, (float) randomGen.nextGaussian() * trainerConfig.initStddev);
+                modelWeights.featureEmbeddings.put(featureHash, Utils.getRandomGaussianArray(randomGen,
                         trainerConfig.initStddev, embeddingSize));
+            }
         }
 
         float prediction = modelWeights.apply(observation);

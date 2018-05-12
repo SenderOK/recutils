@@ -25,8 +25,10 @@ public class RegressionSgdTrainer<T extends ObservationHolder>
     {
         // random initialization for new weights
         for (Integer featureHash : observation.getFeatures().keySet()) {
-            regressionModelWeights.featureWeights.putIfAbsent(
-                    featureHash, (float)randomGen.nextGaussian() * trainerConfig.initStddev);
+            if (!regressionModelWeights.featureWeights.containsKey(featureHash)) {
+                regressionModelWeights.featureWeights.put(
+                        featureHash, (float)randomGen.nextGaussian() * trainerConfig.initStddev);
+            }
         }
 
         float prediction = regressionModelWeights.apply(observation);
