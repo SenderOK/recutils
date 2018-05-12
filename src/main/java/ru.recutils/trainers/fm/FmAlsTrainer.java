@@ -5,7 +5,7 @@ import ru.recutils.trainers.BaseLinearTrainerConfig;
 
 public class FmAlsTrainer {
     public static <T extends ObservationHolder> void train(
-            Iterable<T> dataset,
+            String dataPath,
             FmModelWeights fmModelWeights,
             FmModelConfig modelConfig,
             BaseLinearTrainerConfig trainerConfig)

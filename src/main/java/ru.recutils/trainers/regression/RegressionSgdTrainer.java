@@ -1,71 +1,24 @@
 package ru.recutils.trainers.regression;
 
 import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.DoubleAdder;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import ru.recutils.common.ObservationHolder;
-import ru.recutils.lossfuncs.LossFunction;
+import ru.recutils.io.StringToFeaturesHolderConverter;
+import ru.recutils.trainers.SgdTrainer;
 import ru.recutils.trainers.SgdTrainerConfig;
 
-class RegressionSgdTrainer {
-    private final SgdTrainerConfig trainerConfig;
-    private final Random randomGen;
-    private final ForkJoinPool forkJoinPool;
-    private final LossFunction lossFunction;
+public class RegressionSgdTrainer<T extends ObservationHolder>
+        extends SgdTrainer<T, RegressionModelWeights, RegressionModelConfig> {
 
-    public RegressionSgdTrainer(SgdTrainerConfig trainerConfig) {
-        this.trainerConfig = trainerConfig;
-        this.randomGen = new Random(trainerConfig.seed);
-        this.forkJoinPool = new ForkJoinPool(trainerConfig.numThreads);
-        this.lossFunction = trainerConfig.lossFunctionType.getLossFunction();
-    }
-
-    <T extends ObservationHolder> boolean train(
-            Iterable<T> dataset,
-            RegressionModelWeights regressionModelWeights,
-            RegressionModelConfig modelConfig)
+    public RegressionSgdTrainer(
+            SgdTrainerConfig trainerConfig,
+            StringToFeaturesHolderConverter<T> stringToFeaturesHolderConverter)
     {
-        for (int i = 0; i < trainerConfig.numIter; ++i) {
-            System.out.println("training epoch #" + i);
-
-            DoubleAdder lossSum = new DoubleAdder();
-            AtomicInteger objectCount = new AtomicInteger(0);
-            try {
-                Stream<T> dataStream = StreamSupport.stream(dataset.spliterator(), true);
-                if (!dataStream.iterator().hasNext()) {
-                    return false;
-                }
-                forkJoinPool.submit(() -> dataStream.forEach(observation -> {
-                    if (observation == null) {
-                        return;
-                    }
-
-                    float loss = updateModelWeightsAndReturnLoss(observation, regressionModelWeights, modelConfig);
-
-                    lossSum.add(loss);
-                    objectCount.incrementAndGet();
-                })).get();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                return false;
-            }
-
-            if (objectCount.get() > 0) {
-                System.out.println("Average loss on " + objectCount + " objects is "
-                        + lossSum.sum() / objectCount.get());
-            } else {
-                System.out.println("No objects processed");
-            }
-        }
-        return true;
+        super(trainerConfig, stringToFeaturesHolderConverter);
     }
 
-    private <T extends ObservationHolder> float updateModelWeightsAndReturnLoss(
+    @Override
+    public float updateModelWeightsAndReturnLoss(
             T observation,
             RegressionModelWeights regressionModelWeights,
             RegressionModelConfig modelConfig)
@@ -101,4 +54,5 @@ class RegressionSgdTrainer {
         }
         return loss;
     }
+
 }

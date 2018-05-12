@@ -75,7 +75,7 @@ public class RecUtilsMain {
             RegressionModelConfig regressionModelConfig = RegressionModelConfig.fromCommandLineArguments(args);
             SgdTrainerConfig sgdTrainerConfig = SgdTrainerConfig.fromCommandLineArguments(args);
             hashedLinearModel = new RegressionModel<SimpleObservationHolder>(
-                    featureNameHasher, regressionModelConfig, sgdTrainerConfig);
+                    new VwLineParser(featureNameHasher), regressionModelConfig, sgdTrainerConfig);
         } else if (args.modelType == ModelType.FM) {
             FmModelConfig fmModelConfig = FmModelConfig.fromCommandLineArguments(args);
             BaseLinearTrainerConfig linearTrainerConfig;
@@ -85,15 +85,12 @@ public class RecUtilsMain {
                 linearTrainerConfig = BaseLinearTrainerConfig.fromCommandLineArguments(args);
             }
             hashedLinearModel = new FmModel<SimpleObservationHolder>(
-                    featureNameHasher, fmModelConfig, linearTrainerConfig);
+                    new VwLineParser(featureNameHasher), fmModelConfig, linearTrainerConfig);
         } else {
             System.err.println("FFM is not implemented yet");
             return;
         }
-
-        IterableDataset<SimpleObservationHolder> dataset = new IterableDataset<>(args.trainPath,
-                new VwLineParser(featureNameHasher));
-        hashedLinearModel.fit(dataset);
+        hashedLinearModel.fit(args.trainPath);
 
         System.out.println("Fit model on file " + args.trainPath);
 
@@ -109,12 +106,9 @@ public class RecUtilsMain {
             return;
         }
 
-        FeatureNameHasher featureNameHasher = hashedLinearModel.getFeatureNameHasher();
-        IterableDataset<SimpleObservationHolder> dataset = new IterableDataset<>(args.testPath,
-                new VwLineParser(featureNameHasher));
         List<Float> predictions;
         try {
-            predictions = hashedLinearModel.predict(dataset);
+            predictions = hashedLinearModel.predict(args.testPath);
         } catch (ModelNotTrainedException exception) {
             System.err.println("Could not make predictions, model was not trained");
             return;

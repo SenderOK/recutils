@@ -6,16 +6,13 @@ import java.io.Serializable;
 import java.util.List;
 
 import ru.recutils.exceptions.ModelNotTrainedException;
-import ru.recutils.io.FeatureNameHasher;
 
-public interface HashedLinearModel<ObservationT> extends Serializable {
-    void fit(Iterable<ObservationT> dataset);
+public interface HashedLinearModel extends Serializable {
+    void fit(String dataPath);
 
-    List<Float> predict(Iterable<ObservationT> dataset) throws ModelNotTrainedException;
+    List<Float> predict(String dataPath) throws ModelNotTrainedException;
 
     ModelType getModelType();
-
-    FeatureNameHasher getFeatureNameHasher();
 
     default void dump(String modelPath) {
         try (

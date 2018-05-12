@@ -6,11 +6,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import ru.recutils.common.MathUtils;
+import ru.recutils.common.LinearModelWeights;
+import ru.recutils.common.Utils;
 import ru.recutils.common.ObservationHolder;
 import ru.recutils.trainers.regression.RegressionModelWeights;
 
-public class FmModelWeights implements Serializable {
+public class FmModelWeights implements LinearModelWeights, Serializable {
     final RegressionModelWeights regressionModelWeights;
     final HashMap<Integer, float[]> featureEmbeddings;
     final int embeddingsSize;
@@ -21,6 +22,7 @@ public class FmModelWeights implements Serializable {
         this.embeddingsSize = embeddingsSize;
     }
 
+    @Override
     public float apply(ObservationHolder observationHolder) {
         float result = regressionModelWeights.apply(observationHolder);
 
@@ -36,7 +38,7 @@ public class FmModelWeights implements Serializable {
                     continue;
                 }
                 float[] secondEmbedding = featureEmbeddings.get(features.get(j));
-                result += MathUtils.dotProduct(firstEmbedding, secondEmbedding, embeddingsSize);
+                result += Utils.dotProduct(firstEmbedding, secondEmbedding, embeddingsSize);
             }
         }
         return result;

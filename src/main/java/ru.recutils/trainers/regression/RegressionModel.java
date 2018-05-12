@@ -1,29 +1,29 @@
 package ru.recutils.trainers.regression;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import ru.recutils.common.HashedLinearModel;
+import ru.recutils.common.Utils;
 import ru.recutils.exceptions.ModelNotTrainedException;
 import ru.recutils.common.ModelType;
 import ru.recutils.common.ObservationHolder;
-import ru.recutils.io.FeatureNameHasher;
+import ru.recutils.io.StringToFeaturesHolderConverter;
 import ru.recutils.lossfuncs.LossFunction;
 import ru.recutils.trainers.SgdTrainerConfig;
 
-public class RegressionModel<T extends ObservationHolder> implements HashedLinearModel<T> {
-    private final FeatureNameHasher featureNameHasher;
+public class RegressionModel<T extends ObservationHolder> implements HashedLinearModel {
+    private final StringToFeaturesHolderConverter<T> stringToFeaturesHolderConverter;
     private final RegressionModelConfig regressionModelConfig;
     private final SgdTrainerConfig sgdTrainerConfig;
     private final RegressionModelWeights modelWeights;
     private boolean wasTrained;
 
     public RegressionModel(
-            FeatureNameHasher featureNameHasher,
+            StringToFeaturesHolderConverter<T> stringToFeaturesHolderConverter,
             RegressionModelConfig regressionModelConfig,
             SgdTrainerConfig sgdTrainerConfig)
     {
-        this.featureNameHasher = featureNameHasher;
+        this.stringToFeaturesHolderConverter = stringToFeaturesHolderConverter;
         this.regressionModelConfig = regressionModelConfig;
         this.sgdTrainerConfig = sgdTrainerConfig;
         this.modelWeights = new RegressionModelWeights();
@@ -31,8 +31,9 @@ public class RegressionModel<T extends ObservationHolder> implements HashedLinea
     }
 
     @Override
-    public void fit(Iterable<T> dataset) {
-        this.wasTrained = new RegressionSgdTrainer(sgdTrainerConfig).train(dataset, modelWeights, regressionModelConfig);
+    public void fit(String dataPath) {
+        this.wasTrained = new RegressionSgdTrainer<T>(sgdTrainerConfig, stringToFeaturesHolderConverter)
+                .train(dataPath, modelWeights, regressionModelConfig);
     }
 
     @Override
@@ -41,26 +42,11 @@ public class RegressionModel<T extends ObservationHolder> implements HashedLinea
     }
 
     @Override
-    public FeatureNameHasher getFeatureNameHasher() {
-        return featureNameHasher;
-    }
-
-    @Override
-    public List<Float> predict(Iterable<T> dataset) throws ModelNotTrainedException {
+    public List<Float> predict(String dataPath) throws ModelNotTrainedException {
         if (!wasTrained) {
             throw new ModelNotTrainedException();
         }
-        List<Float> result = new ArrayList<>();
-        float lossSum = 0;
-        int objectCount = 0;
         LossFunction lossFunction = sgdTrainerConfig.lossFunctionType.getLossFunction();
-        for (ObservationHolder observation : dataset) {
-            float prediction = modelWeights.apply(observation);
-            lossSum += lossFunction.value(prediction, observation.getLabel());
-            ++objectCount;
-            result.add(prediction);
-        }
-        System.out.println("Average loss on " + objectCount + " objects is " + lossSum / objectCount);
-        return result;
+        return Utils.predict(dataPath, stringToFeaturesHolderConverter, modelWeights, lossFunction);
     }
 }

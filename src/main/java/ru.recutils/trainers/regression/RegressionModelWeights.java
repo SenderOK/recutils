@@ -4,9 +4,10 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import ru.recutils.common.LinearModelWeights;
 import ru.recutils.common.ObservationHolder;
 
-public class RegressionModelWeights implements Serializable {
+public class RegressionModelWeights implements LinearModelWeights, Serializable {
     public final ConcurrentHashMap<Integer, Float> featureWeights;
     public float bias;
 
@@ -15,6 +16,7 @@ public class RegressionModelWeights implements Serializable {
         this.bias = 0.0f;
     }
 
+    @Override
     public float apply(ObservationHolder observationHolder) {
         Map<Integer, Float> scanMap = observationHolder.getFeatures();
         Map<Integer, Float> lookupMap = featureWeights;

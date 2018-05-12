@@ -10,13 +10,13 @@ public class BaseLinearTrainerConfig implements Serializable {
     public final float initStddev;
     public final int numIter;
 
-    public BaseLinearTrainerConfig(long seed, float initStddev, int numIter) {
+    private BaseLinearTrainerConfig(long seed, float initStddev, int numIter) {
         this.seed = seed;
         this.initStddev = initStddev;
         this.numIter = numIter;
     }
 
-    public BaseLinearTrainerConfig(BaseLinearTrainerConfig config) {
+    BaseLinearTrainerConfig(BaseLinearTrainerConfig config) {
         this(config.seed, config.initStddev, config.numIter);
     }
 

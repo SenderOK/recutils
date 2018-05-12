@@ -1,10 +1,11 @@
 package ru.recutils.io;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
 import ru.recutils.exceptions.DatasetLineParsingException;
 
-public class VwLineParser implements StringToFeaturesHolderConverter<SimpleObservationHolder> {
+public class VwLineParser implements StringToFeaturesHolderConverter<SimpleObservationHolder>, Serializable {
     // parsing format from https://github.com/JohnLangford/vowpal_wabbit/wiki/input-format
     // currently without tag, base and namespaces
 
