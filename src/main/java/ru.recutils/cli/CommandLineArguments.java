@@ -70,6 +70,6 @@ public class CommandLineArguments {
     @Parameter(names={"-s", "--seed"}, description = "random seed for training")
     public long seed = 42;
 
-    @Parameter(names={"-h", "--holdout"}, description = "10% of training is used only for validation")
+    @Parameter(names={"-hold", "--holdout"}, description = "10% of training is used only for validation")
     public boolean useHoldout = false;
 }
