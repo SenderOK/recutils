@@ -18,11 +18,11 @@ import ru.recutils.io.StringToFeaturesHolderConverter;
 import ru.recutils.trainers.BaseLinearTrainerConfig;
 
 public class FmAlsTrainer<T extends ObservationHolder> {
-    public final BaseLinearTrainerConfig trainerConfig;
-    public final Random randomGen;
-    public final StringToFeaturesHolderConverter<T> stringToFeaturesHolderConverter;
+    private final BaseLinearTrainerConfig trainerConfig;
+    private final Random randomGen;
+    private final StringToFeaturesHolderConverter<T> stringToFeaturesHolderConverter;
 
-    public FmAlsTrainer(
+    FmAlsTrainer(
             BaseLinearTrainerConfig trainerConfig,
             StringToFeaturesHolderConverter<T> stringToFeaturesHolderConverter)
     {
@@ -31,7 +31,7 @@ public class FmAlsTrainer<T extends ObservationHolder> {
         this.stringToFeaturesHolderConverter = stringToFeaturesHolderConverter;
     }
 
-    public boolean train(String dataPath, FmModelWeights modelWeights, FmModelConfig modelConfig) throws IOException {
+    boolean train(String dataPath, FmModelWeights modelWeights, FmModelConfig modelConfig) throws IOException {
         Map<Integer, List<Pair<Integer, Float>>> featureHashToObservations = new HashMap<>();
         List<Float> errors = new ArrayList<>();
         List<float[]> weightedEmbeddingsSums = new ArrayList<>();
@@ -72,12 +72,16 @@ public class FmAlsTrainer<T extends ObservationHolder> {
             i.incrementAndGet();
         });
 
-        System.out.println("Starting ALS iterations, initial MSE is " + getMSE(errors) + " for "
+        System.out.println("Starting ALS iterations, initial MSE is " + getMSE(errors, false) + " for "
                 + i.get() + " objects");
         for (int iter = 0; iter < trainerConfig.numIter; ++iter) {
-            System.out.println("training epoch #" + i);
+            System.out.println("training epoch #" + iter);
             alsStep(modelWeights, modelConfig, featureHashToObservations, errors, weightedEmbeddingsSums);
-            System.out.println("Loss: " + getMSE(errors));
+            System.out.print("Total loss: " + getMSE(errors, false));
+            if (trainerConfig.useHoldout) {
+                System.out.print("Holdout loss: " + getMSE(errors, true));
+            }
+            System.out.println("");
         }
 
         return true;
@@ -145,9 +149,9 @@ public class FmAlsTrainer<T extends ObservationHolder> {
             // updating weight and errors
             modelWeights.regressionModelWeights.featureWeights.put(featureHash, newWeight);
             for (Pair<Integer, Float> objectIndexFeatureValuePair : entry.getValue()) {
-                int objectIdx = objectIndexFeatureValuePair.getKey();
+                int objectIndex = objectIndexFeatureValuePair.getKey();
                 float featureValue = objectIndexFeatureValuePair.getValue();
-                errors.set(objectIdx, errors.get(objectIdx) + (newWeight - oldWeight) * featureValue);
+                errors.set(objectIndex, errors.get(objectIndex) + (newWeight - oldWeight) * featureValue);
             }
         }
     }
@@ -168,14 +172,14 @@ public class FmAlsTrainer<T extends ObservationHolder> {
                 float denominator = 0.0f;
                 int trainObservations = 0;
                 for (Pair<Integer, Float> objectIndexFeatureValuePair : entry.getValue()) {
-                    int objectIdx = objectIndexFeatureValuePair.getKey();
-                    if (trainerConfig.useHoldout && objectIdx % 10 == 0) {
+                    int objectIndex = objectIndexFeatureValuePair.getKey();
+                    if (trainerConfig.useHoldout && objectIndex % 10 == 0) {
                         continue;
                     }
                     float featureValue = objectIndexFeatureValuePair.getValue();
-                    float h = (weightedEmbeddingSums.get(objectIdx)[dim] - oldWeight * featureValue) * oldWeight;
+                    float h = (weightedEmbeddingSums.get(objectIndex)[dim] - oldWeight * featureValue) * oldWeight;
 
-                    numerator += (errors.get(objectIdx) - oldWeight * h) * h;
+                    numerator += (errors.get(objectIndex) - oldWeight * h) * h;
                     denominator += h * h;
                     ++trainObservations;
                 }
@@ -185,22 +189,28 @@ public class FmAlsTrainer<T extends ObservationHolder> {
                 // updating weight, errors and weighted embedding
                 modelWeights.featureEmbeddings.get(featureHash)[dim] = newWeight;
                 for (Pair<Integer, Float> objectIndexFeatureValuePair : entry.getValue()) {
-                    int objectIdx = objectIndexFeatureValuePair.getKey();
+                    int objectIndex = objectIndexFeatureValuePair.getKey();
                     float featureValue = objectIndexFeatureValuePair.getValue();
-                    float h = (weightedEmbeddingSums.get(objectIdx)[dim] - oldWeight * featureValue) * oldWeight;
+                    float h = (weightedEmbeddingSums.get(objectIndex)[dim] - oldWeight * featureValue) * oldWeight;
 
-                    errors.set(objectIdx, errors.get(objectIdx) + (newWeight - oldWeight) * h);
-                    weightedEmbeddingSums.get(objectIdx)[dim] += (newWeight - oldWeight) * featureValue;
+                    errors.set(objectIndex, errors.get(objectIndex) + (newWeight - oldWeight) * h);
+                    weightedEmbeddingSums.get(objectIndex)[dim] += (newWeight - oldWeight) * featureValue;
                 }
             }
         }
     }
 
-    private static float getMSE(List<Float> errors) {
+    private static float getMSE(List<Float> errors, boolean holdout) {
         float result = 0.0f;
-        for (float error : errors) {
+        int numErrors = 0;
+        for (int i = 0; i < errors.size(); ++i) {
+            if (holdout && i % 10 != 0) {
+                continue;
+            }
+            float error = errors.get(i);
             result += error * error;
+            ++numErrors;
         }
-        return result / errors.size();
+        return result / numErrors;
     }
 }
