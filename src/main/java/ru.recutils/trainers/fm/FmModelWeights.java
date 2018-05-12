@@ -2,9 +2,9 @@ package ru.recutils.trainers.fm;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import ru.recutils.common.LinearModelWeights;
 import ru.recutils.common.Utils;
@@ -13,12 +13,12 @@ import ru.recutils.trainers.regression.RegressionModelWeights;
 
 public class FmModelWeights implements LinearModelWeights, Serializable {
     final RegressionModelWeights regressionModelWeights;
-    final HashMap<Integer, float[]> featureEmbeddings;
+    final ConcurrentHashMap<Integer, float[]> featureEmbeddings;
     final int embeddingsSize;
 
     public FmModelWeights(int embeddingsSize) {
         this.regressionModelWeights = new RegressionModelWeights();
-        this.featureEmbeddings = new HashMap<>();
+        this.featureEmbeddings = new ConcurrentHashMap<>();
         this.embeddingsSize = embeddingsSize;
     }
 

@@ -83,4 +83,12 @@ public class Utils {
         }
         return embedding;
     }
+
+    public static float[] add(float[] a, float[] b) {
+        float[] result = new float[a.length];
+        for (int i = 0; i < a.length; ++i) {
+            result[i] = a[i] + b[i];
+        }
+        return result;
+    }
 }
