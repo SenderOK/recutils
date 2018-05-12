@@ -18,7 +18,6 @@ import ru.recutils.exceptions.InvalidHashBitSizeException;
 import ru.recutils.exceptions.ModelNotTrainedException;
 import ru.recutils.trainers.fm.FmModel;
 import ru.recutils.io.FeatureNameHasher;
-import ru.recutils.io.IterableDataset;
 import ru.recutils.io.SimpleObservationHolder;
 import ru.recutils.io.VwFeatureNameHasher;
 import ru.recutils.io.VwLineParser;
@@ -70,7 +69,7 @@ public class RecUtilsMain {
         }
 
         FeatureNameHasher featureNameHasher = VwFeatureNameHasher.getHasher(args.hashingBits);
-        HashedLinearModel<SimpleObservationHolder> hashedLinearModel;
+        HashedLinearModel hashedLinearModel;
         if (args.modelType == ModelType.REGRESSION) {
             RegressionModelConfig regressionModelConfig = RegressionModelConfig.fromCommandLineArguments(args);
             SgdTrainerConfig sgdTrainerConfig = SgdTrainerConfig.fromCommandLineArguments(args);
