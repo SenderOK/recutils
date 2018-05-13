@@ -39,6 +39,7 @@ public class FmAlsTrainer<T extends ObservationHolder> {
 
         System.out.println("Reading the dataset");
         AtomicInteger i = new AtomicInteger();
+        AtomicInteger trainObservations = new AtomicInteger();
         Files.lines(Paths.get(dataPath)).forEach(line -> {
             T observation;
             try {
@@ -67,9 +68,11 @@ public class FmAlsTrainer<T extends ObservationHolder> {
 
                 // updating inverted index of observations
                 if (!trainerConfig.useHoldout || index % 10 != 0) {
-                    featureHashToObservations.computeIfAbsent(featureHash, v -> new ArrayList<>())
-                            .add(new Pair<>(index, featureValue));
+                    trainObservations.incrementAndGet();
                 }
+
+                featureHashToObservations.computeIfAbsent(featureHash, v -> new ArrayList<>())
+                        .add(new Pair<>(index, featureValue));
             }
             weightedEmbeddingsSums.add(weightedEmbeddingsSum);
             i.incrementAndGet();
@@ -79,7 +82,8 @@ public class FmAlsTrainer<T extends ObservationHolder> {
                 + i.get() + " objects");
         for (int iter = 0; iter < trainerConfig.numIter; ++iter) {
             System.out.println("training epoch #" + iter);
-            alsStep(modelWeights, modelConfig, featureHashToObservations, errors, weightedEmbeddingsSums);
+            alsStep(modelWeights, modelConfig, featureHashToObservations, errors, weightedEmbeddingsSums,
+                    trainObservations.get());
             System.out.print("Total loss: " + getMSE(errors, false));
             if (trainerConfig.useHoldout) {
                 System.out.print(" Holdout loss: " + getMSE(errors, true));
@@ -95,11 +99,13 @@ public class FmAlsTrainer<T extends ObservationHolder> {
             FmModelConfig modelConfig,
             Map<Integer, List<Pair<Integer, Float>>> featureHashToObservations,
             List<Float> errors,
-            List<float[]> weightedEmbeddingSums)
+            List<float[]> weightedEmbeddingSums,
+            int numTrainObservations)
     {
         updateBias(modelWeights, errors);
-        updateWeights(modelWeights, modelConfig, errors, featureHashToObservations);
-        updateEmbeddings(modelWeights, modelConfig, errors, featureHashToObservations, weightedEmbeddingSums);
+        updateWeights(modelWeights, modelConfig, errors, featureHashToObservations, numTrainObservations);
+        updateEmbeddings(modelWeights, modelConfig, errors, featureHashToObservations, weightedEmbeddingSums,
+                numTrainObservations);
     }
 
     private void updateBias(FmModelWeights modelWeights, List<Float> errors) {
@@ -126,7 +132,8 @@ public class FmAlsTrainer<T extends ObservationHolder> {
             FmModelWeights modelWeights,
             FmModelConfig modelConfig,
             List<Float> errors,
-            Map<Integer, List<Pair<Integer, Float>>> featureHashToObservations)
+            Map<Integer, List<Pair<Integer, Float>>> featureHashToObservations,
+            int numTrainObservations)
     {
         for (Map.Entry<Integer, List<Pair<Integer, Float>>> entry : featureHashToObservations.entrySet()) {
             Integer featureHash = entry.getKey();
@@ -134,17 +141,21 @@ public class FmAlsTrainer<T extends ObservationHolder> {
 
             float numerator = 0.0f;
             float denominator = 0.0f;
-            int trainObservations = 0;
             for (Pair<Integer, Float> objectIndexFeatureValuePair : entry.getValue()) {
-                int objectIdx = objectIndexFeatureValuePair.getKey();
+                int objectIndex = objectIndexFeatureValuePair.getKey();
+                if (trainerConfig.useHoldout && objectIndex % 10 == 0) {
+                    continue;
+                }
                 float featureValue = objectIndexFeatureValuePair.getValue();
 
-                numerator += (errors.get(objectIdx) - oldWeight * featureValue) * featureValue;
+                numerator += (errors.get(objectIndex) - oldWeight * featureValue) * featureValue;
                 denominator += featureValue * featureValue;
-                ++trainObservations;
+            }
+            if (Float.compare(denominator, 0.0f) == 0) {
+                continue;
             }
 
-            float newWeight = - numerator / (denominator + trainObservations * modelConfig.featureWeightsRegularizer);
+            float newWeight = - numerator / (denominator + numTrainObservations * modelConfig.featureWeightsRegularizer);
 
             // updating weight and errors
             modelWeights.regressionModelWeights.featureWeights.put(featureHash, newWeight);
@@ -161,7 +172,8 @@ public class FmAlsTrainer<T extends ObservationHolder> {
             FmModelConfig modelConfig,
             List<Float> errors,
             Map<Integer, List<Pair<Integer, Float>>> featureHashToObservations,
-            List<float[]> weightedEmbeddingSums)
+            List<float[]> weightedEmbeddingSums,
+            int numTrainObservations)
     {
         for (int dim = 0; dim < modelConfig.dimension; ++dim) {
             for (Map.Entry<Integer, List<Pair<Integer, Float>>> entry : featureHashToObservations.entrySet()) {
@@ -170,18 +182,22 @@ public class FmAlsTrainer<T extends ObservationHolder> {
 
                 float numerator = 0.0f;
                 float denominator = 0.0f;
-                int trainObservations = 0;
                 for (Pair<Integer, Float> objectIndexFeatureValuePair : entry.getValue()) {
                     int objectIndex = objectIndexFeatureValuePair.getKey();
+                    if (trainerConfig.useHoldout && objectIndex % 10 == 0) {
+                        continue;
+                    }
                     float featureValue = objectIndexFeatureValuePair.getValue();
                     float h = (weightedEmbeddingSums.get(objectIndex)[dim] - oldWeight * featureValue) * oldWeight;
 
                     numerator += (errors.get(objectIndex) - oldWeight * h) * h;
                     denominator += h * h;
-                    ++trainObservations;
+                }
+                if (Float.compare(denominator, 0.0f) == 0) {
+                    continue;
                 }
 
-                float newWeight = - numerator / (denominator + trainObservations * modelConfig.embeddingsRegularizer);
+                float newWeight = - numerator / (denominator + numTrainObservations * modelConfig.embeddingsRegularizer);
 
                 // updating weight, errors and weighted embedding
                 modelWeights.featureEmbeddings.get(featureHash)[dim] = newWeight;
