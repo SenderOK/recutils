@@ -18,6 +18,8 @@ LSML2018 recommender utils
 
 2) https://www.csie.ntu.edu.tw/~b97053/paper/Factorization%20Machines%20with%20libFM.pdf
 
+3) https://people.eecs.berkeley.edu/~brecht/papers/hogwildTR.pdf - Hogwild!
+
 Утилита работает с файлами в [формате vowpal wabbit](https://github.com/JohnLangford/vowpal_wabbit/wiki/Input-format), в настоящее время без полей *tag*, *base* и неймспейсов. 
 
 Для управления размером модели применяется hashing trick (опция *-hb/--hashing-bits*), для хеширования используется заданное число последних битов MurmurHash3. Модели сохраняются с помощью стандатного метода сериализации в Java (интерфейс Serializable).
