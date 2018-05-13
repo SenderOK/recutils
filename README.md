@@ -58,6 +58,12 @@ sudo apt-get install default-jre
 java -jar recutils.jar --help
 ```
 
+Удобно может быть также сделать alias:
+```
+alias recutils='java -jar /path/to/recutils.jar'
+recutils --help
+```
+
 ### Сборка из исходного кода для Unix/Linux
 В проекте используется система сборки Maven, её необходимо предустановить, также необходим JDK: 
 ```
@@ -73,9 +79,3 @@ cd target
 java -jar recutils.jar --help
 ```
 Последняя команда выводит справку, передавая в соответствии с ней параметры командной строки, производится запуск утилиты.
-
-Удобно может быть также сделать alias:
-```
-alias recutils='java -jar /home/nikitasend/recutils/target/recutils.jar'
-recutils --help
-```
