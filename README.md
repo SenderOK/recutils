@@ -73,3 +73,9 @@ cd target
 java -jar recutils.jar --help
 ```
 Последняя команда выводит справку, передавая в соответствии с ней параметры командной строки, производится запуск утилиты.
+
+Удобно может быть также сделать alias:
+```
+alias recutils='java -jar /home/nikitasend/recutils/target/recutils.jar'
+recutils --help
+```
