@@ -79,7 +79,7 @@ class FmAlsTrainer<T extends ObservationHolder> {
         });
 
         System.out.println("Starting ALS iterations, initial MSE is " + getMSE(errors, false) + " for "
-                + i.get() + " objects");
+                + trainObservations.get() + " objects");
         for (int iter = 0; iter < trainerConfig.numIter; ++iter) {
             System.out.println("training epoch #" + iter);
             alsStep(modelWeights, modelConfig, featureHashToObservations, errors, weightedEmbeddingsSums,
@@ -188,7 +188,7 @@ class FmAlsTrainer<T extends ObservationHolder> {
                         continue;
                     }
                     float featureValue = objectIndexFeatureValuePair.getValue();
-                    float h = (weightedEmbeddingSums.get(objectIndex)[dim] - oldWeight * featureValue) * oldWeight;
+                    float h = (weightedEmbeddingSums.get(objectIndex)[dim] - oldWeight * featureValue) * featureValue;
 
                     numerator += (errors.get(objectIndex) - oldWeight * h) * h;
                     denominator += h * h;
@@ -204,7 +204,7 @@ class FmAlsTrainer<T extends ObservationHolder> {
                 for (Pair<Integer, Float> objectIndexFeatureValuePair : entry.getValue()) {
                     int objectIndex = objectIndexFeatureValuePair.getKey();
                     float featureValue = objectIndexFeatureValuePair.getValue();
-                    float h = (weightedEmbeddingSums.get(objectIndex)[dim] - oldWeight * featureValue) * oldWeight;
+                    float h = (weightedEmbeddingSums.get(objectIndex)[dim] - oldWeight * featureValue) * featureValue;
 
                     errors.set(objectIndex, errors.get(objectIndex) + (newWeight - oldWeight) * h);
                     weightedEmbeddingSums.get(objectIndex)[dim] += (newWeight - oldWeight) * featureValue;
