@@ -53,7 +53,7 @@ sudo apt-get install default-jre
 ```
 
 ### Запуск готового JAR-файла
-Уже собранный JAR-файл можно [скачать][https://yadi.sk/d/R8js3Y6k3VqNmr] и использовать, например, вывести справку:
+Уже собранный JAR-файл можно [скачать](https://yadi.sk/d/R8js3Y6k3VqNmr) и использовать, например, вывести справку:
 ```
 java -jar recutils.jar --help
 ```
