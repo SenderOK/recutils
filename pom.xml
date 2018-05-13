@@ -6,6 +6,25 @@
   <artifactId>recutils</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <executions>
+          <execution>
+           <phase>package</phase>
+           <goals>
+             <goal>shade</goal>
+           </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <finalName>recutils</finalName>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
   <name>recutils</name>
   <url>http://maven.apache.org</url>
