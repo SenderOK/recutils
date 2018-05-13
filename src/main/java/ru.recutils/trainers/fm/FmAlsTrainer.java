@@ -84,7 +84,7 @@ public class FmAlsTrainer<T extends ObservationHolder> {
             System.out.println("training epoch #" + iter);
             alsStep(modelWeights, modelConfig, featureHashToObservations, errors, weightedEmbeddingsSums,
                     trainObservations.get());
-            System.out.print("Total loss: " + getMSE(errors, false));
+            System.out.print("Train loss: " + getMSE(errors, false));
             if (trainerConfig.useHoldout) {
                 System.out.print(" Holdout loss: " + getMSE(errors, true));
             }
@@ -213,11 +213,14 @@ public class FmAlsTrainer<T extends ObservationHolder> {
         }
     }
 
-    private static float getMSE(List<Float> errors, boolean holdout) {
+    private float getMSE(List<Float> errors, boolean holdout) {
         float result = 0.0f;
         int numErrors = 0;
         for (int i = 0; i < errors.size(); ++i) {
-            if (holdout && i % 10 != 0) {
+            if (this.trainerConfig.useHoldout && holdout && i % 10 != 0) {
+                continue;
+            }
+            if (this.trainerConfig.useHoldout && !holdout && i % 10 == 0) {
                 continue;
             }
             float error = errors.get(i);

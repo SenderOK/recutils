@@ -10,12 +10,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.DoubleAdder;
 import java.util.stream.Stream;
 
+import ru.recutils.common.LinearModelWeights;
 import ru.recutils.common.ObservationHolder;
 import ru.recutils.exceptions.DatasetLineParsingException;
 import ru.recutils.io.StringToFeaturesHolderConverter;
 import ru.recutils.lossfuncs.LossFunction;
 
-public abstract class SgdTrainer<T extends ObservationHolder, ModelWeightsT, ModelConfigT> {
+public abstract class SgdTrainer<T extends ObservationHolder, ModelWeightsT extends LinearModelWeights, ModelConfigT> {
     public final SgdTrainerConfig trainerConfig;
     public final Random randomGen;
     public final ForkJoinPool forkJoinPool;
@@ -39,6 +40,8 @@ public abstract class SgdTrainer<T extends ObservationHolder, ModelWeightsT, Mod
 
             DoubleAdder lossSum = new DoubleAdder();
             AtomicInteger objectCount = new AtomicInteger(0);
+            DoubleAdder holdoutLossSum = new DoubleAdder();
+            AtomicInteger holdoutObjectCount = new AtomicInteger(0);
             try (Stream<String> dataStream = Files.lines(Paths.get(dataPath)).parallel()) {
                 forkJoinPool.submit(() -> dataStream.forEach(line -> {
                     T observation;
@@ -49,9 +52,15 @@ public abstract class SgdTrainer<T extends ObservationHolder, ModelWeightsT, Mod
                         return;
                     }
 
-                    float loss = updateModelWeightsAndReturnLoss(observation, modelWeights, modelConfig);
-                    lossSum.add(loss);
-                    objectCount.incrementAndGet();
+                    if (trainerConfig.useHoldout && Math.abs(line.hashCode()) % 10 == 0) {
+                        float loss = lossFunction.value(modelWeights.apply(observation), observation.getLabel());
+                        holdoutLossSum.add(loss);
+                        holdoutObjectCount.incrementAndGet();
+                    } else {
+                        float loss = updateModelWeightsAndReturnLoss(observation, modelWeights, modelConfig);
+                        lossSum.add(loss);
+                        objectCount.incrementAndGet();
+                    }
                 })).get();
             } catch (ExecutionException|InterruptedException ex) {
                 ex.printStackTrace();
@@ -60,8 +69,13 @@ public abstract class SgdTrainer<T extends ObservationHolder, ModelWeightsT, Mod
             }
 
             if (objectCount.get() > 0) {
-                System.out.println("Average loss on " + objectCount + " objects is "
+                System.out.print("Average train loss on " + objectCount.get() + " objects is "
                         + lossSum.sum() / objectCount.get());
+                if (trainerConfig.useHoldout) {
+                    System.out.print("Average holdout loss on " + holdoutObjectCount.get() + " objects is "
+                            + holdoutLossSum.sum() / holdoutObjectCount.get());
+                }
+                System.out.println("");
             } else {
                 System.out.println("No objects processed");
             }
