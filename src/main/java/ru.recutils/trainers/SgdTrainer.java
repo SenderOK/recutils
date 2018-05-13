@@ -72,7 +72,7 @@ public abstract class SgdTrainer<T extends ObservationHolder, ModelWeightsT exte
                 System.out.print("Average train loss on " + objectCount.get() + " objects is "
                         + lossSum.sum() / objectCount.get());
                 if (trainerConfig.useHoldout) {
-                    System.out.print("Average holdout loss on " + holdoutObjectCount.get() + " objects is "
+                    System.out.print(" Average holdout loss on " + holdoutObjectCount.get() + " objects is "
                             + holdoutLossSum.sum() / holdoutObjectCount.get());
                 }
                 System.out.println("");
