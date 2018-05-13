@@ -5,11 +5,11 @@ import java.io.Serializable;
 import ru.recutils.cli.CommandLineArguments;
 
 public class FmModelConfig implements Serializable {
-    public final int dimension;
-    public final float featureWeightsRegularizer;
-    public final float embeddingsRegularizer;
+    final int dimension;
+    final float featureWeightsRegularizer;
+    final float embeddingsRegularizer;
 
-    public FmModelConfig(int dimension, float featureWeightsRegularizer, float embeddingsRegularizer) {
+    private FmModelConfig(int dimension, float featureWeightsRegularizer, float embeddingsRegularizer) {
         this.dimension = dimension;
         this.featureWeightsRegularizer = featureWeightsRegularizer;
         this.embeddingsRegularizer = embeddingsRegularizer;

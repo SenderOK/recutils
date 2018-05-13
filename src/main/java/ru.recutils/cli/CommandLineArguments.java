@@ -35,17 +35,17 @@ public class CommandLineArguments {
             description = "SGD, ALS (only for FM model) (case insensitive)")
     public OptimizationAlgorithmType optimizationAlgorithmType = OptimizationAlgorithmType.SGD;
 
-    @Parameter(names = {"-l2"}, validateWith = PositiveFloat.class,
+    @Parameter(names = {"-l2"}, validateWith = NonNegativeFloat.class,
             description = "l2 regularizer for feature weights")
     public float featureWeightsRegularizer = 0.1f;
 
-    @Parameter(names = {"-l2e"}, validateWith = PositiveFloat.class,
+    @Parameter(names = {"-l2e"}, validateWith = NonNegativeFloat.class,
             description = "l2 regularizer for feature embeddings (only for FM model)")
     public float embeddingsRegularizer = 0.1f;
 
     @Parameter(names = {"-r", "--learning-rate"}, validateWith = PositiveFloat.class,
             description = "learning rate (for SGD training)")
-    public float learningRate = 0.01f;
+    public float learningRate = 0.001f;
 
     @Parameter(names = {"-iter"}, validateWith = PositiveInteger.class,
             description = "dataset passes for SGD, number of iterations for ALS training")
@@ -57,7 +57,7 @@ public class CommandLineArguments {
 
     @Parameter(names={"-d", "--dimension"}, validateWith = PositiveInteger.class,
             description = "embeddings dimensionality in FM (for training)")
-    public int dimension = 20;
+    public int dimension = 10;
 
     @Parameter(names={"-t", "--threads"}, validateWith = PositiveInteger.class,
             description = "number of threads (using Hogwild! for SGD training)")

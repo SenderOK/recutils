@@ -17,11 +17,11 @@ import ru.recutils.io.StringToFeaturesHolderConverter;
 import ru.recutils.lossfuncs.LossFunction;
 
 public abstract class SgdTrainer<T extends ObservationHolder, ModelWeightsT extends LinearModelWeights, ModelConfigT> {
-    public final SgdTrainerConfig trainerConfig;
-    public final Random randomGen;
-    public final ForkJoinPool forkJoinPool;
-    public final LossFunction lossFunction;
-    public final StringToFeaturesHolderConverter<T> stringToFeaturesHolderConverter;
+    protected final SgdTrainerConfig trainerConfig;
+    protected final Random randomGen;
+    protected final ForkJoinPool forkJoinPool;
+    protected final LossFunction lossFunction;
+    protected final StringToFeaturesHolderConverter<T> stringToFeaturesHolderConverter;
 
     public SgdTrainer(
             SgdTrainerConfig trainerConfig,

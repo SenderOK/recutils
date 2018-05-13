@@ -6,10 +6,9 @@ import java.util.List;
 
 import ru.recutils.common.HashedLinearModel;
 import ru.recutils.common.LossFunctionType;
+import ru.recutils.common.ModelUtils;
 import ru.recutils.common.OptimizationAlgorithmType;
-import ru.recutils.common.Utils;
 import ru.recutils.exceptions.ModelNotTrainedException;
-import ru.recutils.common.ModelType;
 import ru.recutils.common.ObservationHolder;
 import ru.recutils.io.StringToFeaturesHolderConverter;
 import ru.recutils.lossfuncs.LossFunction;
@@ -56,11 +55,6 @@ public class FmModel<T extends ObservationHolder> implements HashedLinearModel, 
                 ? ((SgdTrainerConfig) trainerConfig).lossFunctionType.getLossFunction()
                 : LossFunctionType.MSE.getLossFunction();
 
-        return Utils.predict(dataPath, stringToFeaturesHolderConverter, modelWeights, lossFunction);
-    }
-
-    @Override
-    public ModelType getModelType() {
-        return ModelType.FM;
+        return ModelUtils.predict(dataPath, stringToFeaturesHolderConverter, modelWeights, lossFunction);
     }
 }

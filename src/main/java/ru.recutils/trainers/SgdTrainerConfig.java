@@ -11,7 +11,7 @@ public class SgdTrainerConfig extends BaseLinearTrainerConfig implements Seriali
     public final float learningRate;
     public final int numThreads;
 
-    public SgdTrainerConfig(
+    private SgdTrainerConfig(
             BaseLinearTrainerConfig config,
             LossFunctionType lossFunctionType,
             float learningRate,

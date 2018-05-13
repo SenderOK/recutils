@@ -2,7 +2,7 @@ package ru.recutils.trainers.fm;
 
 import java.util.Map;
 
-import ru.recutils.common.Utils;
+import ru.recutils.common.MathUtils;
 import ru.recutils.common.ObservationHolder;
 import ru.recutils.io.StringToFeaturesHolderConverter;
 import ru.recutils.trainers.SgdTrainer;
@@ -10,7 +10,7 @@ import ru.recutils.trainers.SgdTrainerConfig;
 
 public class FmSgdTrainer<T extends ObservationHolder> extends SgdTrainer<T, FmModelWeights, FmModelConfig> {
 
-    public FmSgdTrainer(
+    FmSgdTrainer(
             SgdTrainerConfig trainerConfig,
             StringToFeaturesHolderConverter<T> stringToFeaturesHolderConverter)
     {
@@ -38,7 +38,7 @@ public class FmSgdTrainer<T extends ObservationHolder> extends SgdTrainer<T, FmM
             int featureHash = entry.getKey();
             float featureValue = entry.getValue();
 
-            Utils.inplaceAddWithScale(
+            MathUtils.inplaceAddWithScale(
                     weightedEmbeddingsSum,
                     modelWeights.featureEmbeddings.get(featureHash),
                     featureValue,
@@ -62,11 +62,11 @@ public class FmSgdTrainer<T extends ObservationHolder> extends SgdTrainer<T, FmM
             // updating embedding
             float[] embeddingToUpdate = modelWeights.featureEmbeddings.get(featureHash).clone();
             float[] dLde = weightedEmbeddingsSum.clone();
-            Utils.inplaceAddWithScale(dLde, embeddingToUpdate, -featureValue, embeddingSize);
-            Utils.inplaceScale(dLde, dLdp * featureValue);
-            Utils.inplaceAddWithScale(dLde, embeddingToUpdate, modelConfig.embeddingsRegularizer, embeddingSize);
-            Utils.inplaceScale(dLde, -trainerConfig.learningRate * importance);
-            modelWeights.featureEmbeddings.merge(featureHash, dLde, (a, b) -> Utils.add(a, b));
+            MathUtils.inplaceAddWithScale(dLde, embeddingToUpdate, -featureValue, embeddingSize);
+            MathUtils.inplaceScale(dLde, dLdp * featureValue);
+            MathUtils.inplaceAddWithScale(dLde, embeddingToUpdate, modelConfig.embeddingsRegularizer, embeddingSize);
+            MathUtils.inplaceScale(dLde, -trainerConfig.learningRate * importance);
+            modelWeights.featureEmbeddings.merge(featureHash, dLde, (a, b) -> MathUtils.add(a, b));
         }
 
         return loss;

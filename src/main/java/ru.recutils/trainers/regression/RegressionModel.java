@@ -4,9 +4,8 @@ import java.io.IOException;
 import java.util.List;
 
 import ru.recutils.common.HashedLinearModel;
-import ru.recutils.common.Utils;
+import ru.recutils.common.ModelUtils;
 import ru.recutils.exceptions.ModelNotTrainedException;
-import ru.recutils.common.ModelType;
 import ru.recutils.common.ObservationHolder;
 import ru.recutils.io.StringToFeaturesHolderConverter;
 import ru.recutils.lossfuncs.LossFunction;
@@ -38,16 +37,11 @@ public class RegressionModel<T extends ObservationHolder> implements HashedLinea
     }
 
     @Override
-    public ModelType getModelType() {
-        return ModelType.REGRESSION;
-    }
-
-    @Override
     public List<Float> predict(String dataPath) throws ModelNotTrainedException, IOException {
         if (!wasTrained) {
             throw new ModelNotTrainedException();
         }
         LossFunction lossFunction = sgdTrainerConfig.lossFunctionType.getLossFunction();
-        return Utils.predict(dataPath, stringToFeaturesHolderConverter, modelWeights, lossFunction);
+        return ModelUtils.predict(dataPath, stringToFeaturesHolderConverter, modelWeights, lossFunction);
     }
 }

@@ -6,7 +6,7 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 import ru.recutils.common.LinearModelWeights;
-import ru.recutils.common.Utils;
+import ru.recutils.common.MathUtils;
 import ru.recutils.common.ObservationHolder;
 import ru.recutils.trainers.regression.RegressionModelWeights;
 
@@ -15,7 +15,7 @@ public class FmModelWeights implements LinearModelWeights, Serializable {
     final ConcurrentHashMap<Integer, float[]> featureEmbeddings;
     final int embeddingsSize;
 
-    public FmModelWeights(int embeddingsSize) {
+    FmModelWeights(int embeddingsSize) {
         this.regressionModelWeights = new RegressionModelWeights();
         this.featureEmbeddings = new ConcurrentHashMap<>();
         this.embeddingsSize = embeddingsSize;
@@ -34,19 +34,19 @@ public class FmModelWeights implements LinearModelWeights, Serializable {
                 continue;
             }
             float[] embedding = featureEmbeddings.get(featureHash).clone();
-            Utils.inplaceAddWithScale(linearCombination, embedding, featureValue, embeddingsSize);
-            squaredNormsSum += Utils.l2normSquared(embedding) * featureValue * featureValue;
+            MathUtils.inplaceAddWithScale(linearCombination, embedding, featureValue, embeddingsSize);
+            squaredNormsSum += MathUtils.l2normSquared(embedding) * featureValue * featureValue;
         }
-        return result + 0.5f * (Utils.l2normSquared(linearCombination) - squaredNormsSum);
+        return result + 0.5f * (MathUtils.l2normSquared(linearCombination) - squaredNormsSum);
     }
 
-    public void initializeZeroWeights(ObservationHolder observation, Random randomGen, float stddev) {
+    void initializeZeroWeights(ObservationHolder observation, Random randomGen, float stddev) {
         for (Integer featureHash : observation.getFeatures().keySet()) {
             if (!regressionModelWeights.featureWeights.containsKey(featureHash)) {
                 regressionModelWeights.featureWeights.put(featureHash, (float) randomGen.nextGaussian() * stddev);
             }
             if (!featureEmbeddings.containsKey(featureHash)) {
-                featureEmbeddings.put(featureHash, Utils.getRandomGaussianArray(randomGen, stddev, embeddingsSize));
+                featureEmbeddings.put(featureHash, MathUtils.getRandomGaussianArray(randomGen, stddev, embeddingsSize));
             }
         }
     }

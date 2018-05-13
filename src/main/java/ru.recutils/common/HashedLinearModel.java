@@ -13,8 +13,6 @@ public interface HashedLinearModel extends Serializable {
 
     List<Float> predict(String dataPath) throws ModelNotTrainedException, IOException;
 
-    ModelType getModelType();
-
     default void dump(String modelPath) {
         try (
                 FileOutputStream fileOutputStream = new FileOutputStream(modelPath);

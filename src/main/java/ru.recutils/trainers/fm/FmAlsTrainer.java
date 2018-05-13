@@ -12,12 +12,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javafx.util.Pair;
 import ru.recutils.common.ObservationHolder;
-import ru.recutils.common.Utils;
+import ru.recutils.common.MathUtils;
 import ru.recutils.exceptions.DatasetLineParsingException;
 import ru.recutils.io.StringToFeaturesHolderConverter;
 import ru.recutils.trainers.BaseLinearTrainerConfig;
 
-public class FmAlsTrainer<T extends ObservationHolder> {
+class FmAlsTrainer<T extends ObservationHolder> {
     private final BaseLinearTrainerConfig trainerConfig;
     private final Random randomGen;
     private final StringToFeaturesHolderConverter<T> stringToFeaturesHolderConverter;
@@ -59,7 +59,7 @@ public class FmAlsTrainer<T extends ObservationHolder> {
                 int featureHash = entry.getKey();
                 float featureValue = entry.getValue();
 
-                Utils.inplaceAddWithScale(
+                MathUtils.inplaceAddWithScale(
                         weightedEmbeddingsSum,
                         modelWeights.featureEmbeddings.get(featureHash),
                         featureValue,
