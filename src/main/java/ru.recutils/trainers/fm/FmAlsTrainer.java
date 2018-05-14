@@ -50,6 +50,10 @@ class FmAlsTrainer<T extends ObservationHolder> {
             }
 
             int index = i.get();
+            if (!trainerConfig.useHoldout || index % 10 != 0) {
+                trainObservations.incrementAndGet();
+            }
+
             modelWeights.initializeZeroWeights(observation, randomGen, trainerConfig.initStddev);
             errors.add(modelWeights.apply(observation) - observation.getLabel());
 
@@ -67,10 +71,6 @@ class FmAlsTrainer<T extends ObservationHolder> {
                 );
 
                 // updating inverted index of observations
-                if (!trainerConfig.useHoldout || index % 10 != 0) {
-                    trainObservations.incrementAndGet();
-                }
-
                 featureHashToObservations.computeIfAbsent(featureHash, v -> new ArrayList<>())
                         .add(new Pair<>(index, featureValue));
             }
