@@ -80,15 +80,28 @@ class FmAlsTrainer<T extends ObservationHolder> {
 
         System.out.println("Starting ALS iterations, initial MSE is " + getMSE(errors, false) + " for "
                 + trainObservations.get() + " objects");
+
+        int itersWithoutEnhancement = 0;
+        double bestHoldoutLoss = 1e100;
         for (int iter = 0; iter < trainerConfig.numIter; ++iter) {
             System.out.println("training epoch #" + iter);
             alsStep(modelWeights, modelConfig, featureHashToObservations, errors, weightedEmbeddingsSums,
                     trainObservations.get());
             System.out.print("Train loss: " + getMSE(errors, false));
             if (trainerConfig.useHoldout) {
-                System.out.print(" Holdout loss: " + getMSE(errors, true));
+                float holdoutLoss = getMSE(errors, true);
+                System.out.print(" Holdout loss: " + holdoutLoss);
+                if (holdoutLoss < bestHoldoutLoss) {
+                    bestHoldoutLoss = holdoutLoss;
+                    itersWithoutEnhancement = 0;
+                } else {
+                    ++itersWithoutEnhancement;
+                }
             }
             System.out.println("");
+            if (trainerConfig.useHoldout && itersWithoutEnhancement == trainerConfig.earlyStoppingIters) {
+                break;
+            }
         }
 
         return true;

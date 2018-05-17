@@ -47,6 +47,10 @@ public class CommandLineArguments {
             description = "learning rate (for SGD training)")
     public float learningRate = 0.001f;
 
+    @Parameter(names = {"-rd", "--learning-rate-decay"}, validateWith = PositiveFloat.class,
+            description = "a constant to multiply learning rate every iteration (for SGD training)")
+    public float learningRateDecay = 1.0f;
+
     @Parameter(names = {"-iter"}, validateWith = PositiveInteger.class,
             description = "dataset passes for SGD, number of iterations for ALS training")
     public int numIter = 100;
@@ -72,4 +76,8 @@ public class CommandLineArguments {
 
     @Parameter(names={"-hold", "--holdout"}, description = "10% of training is used only for validation")
     public boolean useHoldout = false;
+
+    @Parameter(names={"-e", "--early-stopping-iters"}, validateWith = PositiveInteger.class,
+            description = "if holdout is used, number of iterations without progress to stop, set to -1 if not needed")
+    public int earlyStoppingIters = 3;
 }

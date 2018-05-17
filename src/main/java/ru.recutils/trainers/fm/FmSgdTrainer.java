@@ -29,7 +29,7 @@ public class FmSgdTrainer<T extends ObservationHolder> extends SgdTrainer<T, FmM
         float dLdp = lossFunction.derivative(prediction, label);
 
         // updating bias
-        modelWeights.regressionModelWeights.bias -= trainerConfig.learningRate *
+        modelWeights.regressionModelWeights.bias -= currentLearningRate *
                 lossFunction.derivative(prediction, label); // 2 atomic ops, but nobody cares
 
         // precalculating weighted sum of embedding vectors
@@ -55,7 +55,7 @@ public class FmSgdTrainer<T extends ObservationHolder> extends SgdTrainer<T, FmM
                     * modelWeights.regressionModelWeights.featureWeights.get(featureHash);
             modelWeights.regressionModelWeights.featureWeights.merge(
                     featureHash,
-                    -trainerConfig.learningRate * importance * weightGradient,
+                    -currentLearningRate * importance * weightGradient,
                     (a, b) -> a + b
             );
 
@@ -65,7 +65,7 @@ public class FmSgdTrainer<T extends ObservationHolder> extends SgdTrainer<T, FmM
             MathUtils.inplaceAddWithScale(dLde, embeddingToUpdate, -featureValue, embeddingSize);
             MathUtils.inplaceScale(dLde, dLdp * featureValue);
             MathUtils.inplaceAddWithScale(dLde, embeddingToUpdate, modelConfig.embeddingsRegularizer, embeddingSize);
-            MathUtils.inplaceScale(dLde, -trainerConfig.learningRate * importance);
+            MathUtils.inplaceScale(dLde, -currentLearningRate * importance);
             modelWeights.featureEmbeddings.merge(featureHash, dLde, (a, b) -> MathUtils.add(a, b));
         }
 

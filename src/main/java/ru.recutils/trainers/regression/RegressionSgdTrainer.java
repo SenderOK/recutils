@@ -38,7 +38,7 @@ public class RegressionSgdTrainer<T extends ObservationHolder>
         float dLdp = lossFunction.derivative(prediction, label);
 
         // updating bias
-        regressionModelWeights.bias -= trainerConfig.learningRate * dLdp; // 2 atomic ops, but nobody cares
+        regressionModelWeights.bias -= currentLearningRate * dLdp; // 2 atomic ops, but nobody cares
 
         // updating weights
         for (Map.Entry<Integer, Float> entry : observation.getFeatures().entrySet()) {
@@ -48,7 +48,7 @@ public class RegressionSgdTrainer<T extends ObservationHolder>
                     * regressionModelWeights.featureWeights.get(featureHash);
             regressionModelWeights.featureWeights.merge(
                     featureHash,
-                    -trainerConfig.learningRate * importance * gradient,
+                    -currentLearningRate * importance * gradient,
                     (a, b) -> a + b
             );
         }

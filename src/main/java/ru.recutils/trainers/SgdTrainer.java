@@ -23,6 +23,8 @@ public abstract class SgdTrainer<T extends ObservationHolder, ModelWeightsT exte
     protected final LossFunction lossFunction;
     protected final StringToFeaturesHolderConverter<T> stringToFeaturesHolderConverter;
 
+    protected float currentLearningRate;
+
     public SgdTrainer(
             SgdTrainerConfig trainerConfig,
             StringToFeaturesHolderConverter<T> stringToFeaturesHolderConverter)
@@ -32,9 +34,12 @@ public abstract class SgdTrainer<T extends ObservationHolder, ModelWeightsT exte
         this.forkJoinPool = new ForkJoinPool(trainerConfig.numThreads);
         this.lossFunction = trainerConfig.lossFunctionType.getLossFunction();
         this.stringToFeaturesHolderConverter = stringToFeaturesHolderConverter;
+        this.currentLearningRate = trainerConfig.learningRate;
     }
 
     public boolean train(String dataPath, ModelWeightsT modelWeights, ModelConfigT modelConfig) throws IOException {
+        int itersWithoutEnhancement = 0;
+        double bestHoldoutLoss = 1e100;
         for (int i = 0; i < trainerConfig.numIter; ++i) {
             System.out.println("training epoch #" + i);
 
@@ -68,17 +73,28 @@ public abstract class SgdTrainer<T extends ObservationHolder, ModelWeightsT exte
                 return false;
             }
 
-            if (objectCount.get() > 0) {
-                System.out.print("Average train loss on " + objectCount.get() + " objects is "
-                        + lossSum.sum() / objectCount.get());
-                if (trainerConfig.useHoldout) {
-                    System.out.print(" Average holdout loss on " + holdoutObjectCount.get() + " objects is "
-                            + holdoutLossSum.sum() / holdoutObjectCount.get());
-                }
-                System.out.println("");
-            } else {
+            if (objectCount.get() == 0) {
                 System.out.println("No objects processed");
+                return false;
             }
+            System.out.print("Average train loss on " + objectCount.get() + " objects is "
+                    + lossSum.sum() / objectCount.get());
+            if (trainerConfig.useHoldout) {
+                double holdoutLoss = holdoutLossSum.sum() / holdoutObjectCount.get();
+                System.out.print(" Average holdout loss on " + holdoutObjectCount.get() + " objects is " + holdoutLoss);
+                if (holdoutLoss < bestHoldoutLoss) {
+                    bestHoldoutLoss = holdoutLoss;
+                    itersWithoutEnhancement = 0;
+                } else {
+                    ++itersWithoutEnhancement;
+                }
+            }
+            System.out.println("");
+            if (trainerConfig.useHoldout && itersWithoutEnhancement == trainerConfig.earlyStoppingIters) {
+                break;
+            }
+
+            currentLearningRate *= trainerConfig.learningRateDecay;
         }
         return true;
     }
